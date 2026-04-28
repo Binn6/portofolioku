@@ -116,7 +116,7 @@ Pre-seeded data for:
 - 3 projects: Website Alamat Hutan, Website Desa, Thesis project
 - 4 experiences: 2 internships (Balai LHK Jan-Feb 2025, Disbudpar Sul-Sel Mar-Jun 2025) + 2 org roles (Ketua Umum MPK 2021-2022, MPK Member 2019-2020)
 - 1 education entry: S1 Statistics, Universitas Hasanuddin
-- Admin user seeded with: email `mochsabilabyan12@gmail.com`, password `admin123` (must be changed after first login)
+- Admin user seeded with: username `abin`, email `mochsabilabyan12@gmail.com`, password `thisme`
 
 ---
 
@@ -172,7 +172,15 @@ colors: {
 /admin/messages
 ```
 
+### Splash Screen
+A full-screen loading screen shown on initial page load while all API data is fetched. Dismissed once all requests resolve. Implemented as a GSAP-animated overlay:
+- Displays name initials or logo mark with a fade+scale entrance
+- Thin warm-white progress line animates across the bottom
+- Exit: slides up and out revealing the portfolio beneath
+- Skipped if data loads in under 300ms (no flash of loading screen)
+
 ### Page Sections (single-page portfolio)
+0. `SplashScreen` — full-screen loader, dismissed after all API calls resolve
 1. `Hero` — name, title, CTA buttons, profile photo
 2. `About` — bio paragraph, photo, key facts
 3. `Skills` — categorized skill badges with level indicator
@@ -186,6 +194,7 @@ colors: {
 **Animation:**
 | Component | Library | Purpose |
 |---|---|---|
+| `SplashScreen` | GSAP | Full-screen loader, exits with slide-up once data is ready |
 | `PageTransition` | Framer Motion | Wraps route pages, fade+slide transition |
 | `AnimatedSection` | GSAP ScrollTrigger | Reveals section on scroll enter |
 | `RevealText` | GSAP | Word/line split entrance on scroll |
@@ -206,7 +215,7 @@ colors: {
 | `AdminLayout` | Sidebar layout for admin pages |
 
 ### Animation Strategy
-- **GSAP only:** Hero entrance timeline, ScrollTrigger section reveals, `RevealText` split text, `ScrollProgressBar`
+- **GSAP only:** `SplashScreen` entrance + exit, Hero entrance timeline, ScrollTrigger section reveals, `RevealText` split text, `ScrollProgressBar`
 - **Framer Motion only:** Page transitions, card hover states, button micro-interactions, admin sidebar/modal animations, navbar mobile drawer
 - **Never mix both in the same component**
 - `prefers-reduced-motion` respected: all GSAP timelines check `window.matchMedia('(prefers-reduced-motion: reduce)')`
