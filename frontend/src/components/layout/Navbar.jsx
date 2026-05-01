@@ -29,7 +29,8 @@ export default function Navbar() {
         initial={{ y: -24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.5, ease: 'easeOut' }}
-        className="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden md:block"
+        className="fixed top-5 z-50 hidden md:block"
+        style={{ left: '50%', translateX: '-50%' }}
       >
         <div
           className={`flex items-center gap-1 pl-5 pr-2 py-2 rounded-full border transition-all duration-300 ${

@@ -11,8 +11,12 @@ export default function Messages() {
   const items = list ?? messages ?? []
 
   const markRead = async (id) => {
-    const { data } = await adminMarkRead(id)
-    setList(items.map((m) => (m._id === id ? data : m)))
+    try {
+      await adminMarkRead(id)
+      setList(items.map((m) => (String(m._id) === String(id) ? { ...m, is_read: true } : m)))
+    } catch {
+      // silent — button stays visible so user can retry
+    }
   }
 
   return (

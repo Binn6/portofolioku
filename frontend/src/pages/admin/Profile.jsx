@@ -37,11 +37,11 @@ export default function AdminProfile() {
     setSaving(true)
     setError(null)
     try {
-      const payload = { ...form }
-      // Laravel's nullable|url validation rejects empty strings — send null instead
-      ;['github', 'linkedin', 'instagram'].forEach((k) => {
-        if (payload[k] === '') payload[k] = null
-      })
+      // Only send known profile fields — MongoDB internal fields (_id, cv_path, etc.) cause 422
+      const keys = ['name', 'title', 'bio', 'location', 'email', 'phone', 'github', 'linkedin', 'instagram']
+      const payload = Object.fromEntries(
+        keys.map((k) => [k, form[k] === '' ? null : (form[k] ?? null)])
+      )
       await adminUpdateProfile(payload)
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
