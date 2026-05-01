@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurora Options</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #060606; color: #fafaf9; font-family: 'Inter', sans-serif; padding: 24px; }
+  h2 { font-size: 20px; margin-bottom: 6px; }
+  .sub { color: #a8a29e; font-size: 13px; margin-bottom: 28px; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:700px){ .cards { grid-template-columns: 1fr; } }
+
+  .card {
+    border: 1.5px solid #2a2a2a;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .card:hover { border-color: #555; transform: translateY(-2px); }
+  .card.selected { border-color: #fafaf9; }
+
+  .preview {
+    height: 260px;
+    position: relative;
+    overflow: hidden;
+    background: #080808;
+  }
+
+  /* Hero text overlay */
+  .hero-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 28px;
+    z-index: 10;
+  }
+  .hero-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(168,162,158,0.8);
+    margin-bottom: 10px;
+  }
+  .hero-name {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fafaf9;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+  }
+  .hero-title {
+    font-size: 13px;
+    color: rgba(168,162,158,0.9);
+    text-shadow: 0 1px 10px rgba(0,0,0,0.9);
+  }
+  .hero-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .btn-primary {
+    background: rgba(250,250,249,0.9);
+    color: #0a0a0a;
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .btn-outline {
+    border: 1px solid rgba(250,250,249,0.3);
+    color: rgba(250,250,249,0.7);
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 11px;
+  }
+
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .card-body { padding: 16px 18px; background: #111; }
+  .card-body h3 { font-size: 15px; margin-bottom: 5px; }
+  .card-body p { font-size: 12px; color: #a8a29e; line-height: 1.5; }
+  .tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px; margin-top: 8px; }
+
+  .selected-indicator {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #fafaf9; color: #0a0a0a;
+    padding: 10px 24px; border-radius: 99px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .selected-indicator.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h2>Aurora Curtains — Color Options</h2>
+<p class="sub">Pilih warna aurora yang paling pas. Text hero tetap legible di semua opsi.</p>
+
+<div class="cards">
+
+  <!-- OPTION A: FIRE -->
+  <div class="card" onclick="select(this,'fire')">
+    <div class="preview">
+      <canvas id="ca"></canvas>
+      <!-- dark vignette so text stays readable -->
+      <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.2) 60%,rgba(0,0,0,0.1) 100%);z-index:5;"></div>
+      <div class="hero-text">
+        <div class="hero-label">Hello, I am</div>
+        <div class="hero-name">Mochsabil<br>Em Abyan</div>
+        <div class="hero-title">Data Analyst & Web Developer</div>
+        <div class="hero-btns">
+          <div class="btn-primary">Get in touch</div>
+          <div class="btn-outline">Download CV</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>🔥 Fire Aurora</h3>
+      <p>Warm reds, deep oranges, and amber curtains — intense, energetic, and bold. Feels like lava meeting sky.</p>
+      <span class="tag" style="background:rgba(220,60,20,0.2);color:#f97316;">#ff4500 → #ff8c00 → #ffd700</span>
+    </div>
+  </div>
+
+  <!-- OPTION B: BOREALIS -->
+  <div class="card" onclick="select(this,'borealis')">
+    <div class="preview">
+      <canvas id="cb"></canvas>
+      <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.2) 60%,rgba(0,0,0,0.1) 100%);z-index:5;"></div>
+      <div class="hero-text">
+        <div class="hero-label">Hello, I am</div>
+        <div class="hero-name">Mochsabil<br>Em Abyan</div>
+        <div class="hero-title">Data Analyst & Web Developer</div>
+        <div class="hero-btns">
+          <div class="btn-primary">Get in touch</div>
+          <div class="btn-outline">Download CV</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>🌌 Aurora Borealis</h3>
+      <p>Real northern lights — teal greens, deep purples, soft blues. Ethereal, premium, and beautiful.</p>
+      <span class="tag" style="background:rgba(0,200,150,0.15);color:#2dd4bf;">#00c8a0 → #6366f1 → #38bdf8</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="selected-indicator" id="indicator">✓ Selected</div>
+
+<script>
+function select(el, name) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const ind = document.getElementById('indicator');
+  ind.textContent = '✓ ' + (name === 'fire' ? 'Fire Aurora selected' : 'Aurora Borealis selected');
+  ind.classList.add('show');
+  setTimeout(() => ind.classList.remove('show'), 2500);
+  if (window.__superpowers_record) window.__superpowers_record({type:'click', choice: name, text: name});
+}
+
+// === FIRE AURORA ===
+(function(){
+  const cv = document.getElementById('ca');
+  if (!cv) return;
+  const resize = () => { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; };
+  resize();
+  const ctx = cv.getContext('2d');
+
+  const COLORS_FIRE = [
+    [255, 40, 0],    // deep red
+    [255, 100, 0],   // orange-red
+    [255, 160, 0],   // amber
+    [255, 200, 20],  // gold
+    [220, 30, 10],   // crimson
+  ];
+
+  const cols = Array.from({length: 22}, (_, i) => ({
+    x: (i / 21) * cv.width,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.007 + 0.003,
+    amp: Math.random() * 22 + 10,
+    colorIdx: Math.floor(Math.random() * COLORS_FIRE.length),
+    o: Math.random() * 0.22 + 0.08,
+    w: Math.random() * 2.5 + 1,
+    vphase: Math.random() * Math.PI * 2,
+    vspeed: Math.random() * 0.005 + 0.002,
+  }));
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+
+    // base glow at bottom
+    const baseGlow = ctx.createLinearGradient(0, cv.height * 0.5, 0, cv.height);
+    baseGlow.addColorStop(0, 'rgba(0,0,0,0)');
+    baseGlow.addColorStop(1, 'rgba(180,30,0,0.08)');
+    ctx.fillStyle = baseGlow; ctx.fillRect(0, 0, cv.width, cv.height);
+
+    cols.forEach(c => {
+      const [r, g, b] = COLORS_FIRE[c.colorIdx];
+      const alphaPulse = c.o * (0.7 + Math.sin(t * c.vspeed + c.vphase) * 0.3);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, cv.height);
+      grad.addColorStop(0, `rgba(${r},${g},${b},0)`);
+      grad.addColorStop(0.15, `rgba(${r},${g},${b},${alphaPulse * 0.3})`);
+      grad.addColorStop(0.45, `rgba(${r},${g},${b},${alphaPulse})`);
+      grad.addColorStop(0.75, `rgba(${r},${g},${b},${alphaPulse * 0.4})`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+
+      ctx.beginPath();
+      ctx.moveTo(c.x, 0);
+      for (let y = 0; y <= cv.height; y += 6) {
+        const sx = c.x + Math.sin(t * c.speed + c.phase + y * 0.035) * c.amp;
+        ctx.lineTo(sx, y);
+      }
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = c.w;
+      ctx.stroke();
+    });
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// === AURORA BOREALIS ===
+(function(){
+  const cv = document.getElementById('cb');
+  if (!cv) return;
+  const resize = () => { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; };
+  resize();
+  const ctx = cv.getContext('2d');
+
+  const COLORS_BOREALIS = [
+    [0, 210, 170],    // teal green
+    [0, 180, 220],    // sky blue
+    [99, 102, 241],   // indigo/purple
+    [45, 212, 191],   // cyan-teal
+    [139, 92, 246],   // violet
+    [56, 189, 248],   // light blue
+  ];
+
+  const cols = Array.from({length: 22}, (_, i) => ({
+    x: (i / 21) * cv.width,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.006 + 0.002,
+    amp: Math.random() * 24 + 12,
+    colorIdx: Math.floor(Math.random() * COLORS_BOREALIS.length),
+    o: Math.random() * 0.28 + 0.08,
+    w: Math.random() * 2.5 + 1,
+    vphase: Math.random() * Math.PI * 2,
+    vspeed: Math.random() * 0.004 + 0.002,
+  }));
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+
+    // subtle deep space base
+    const baseGlow = ctx.createLinearGradient(0, 0, 0, cv.height);
+    baseGlow.addColorStop(0, 'rgba(0,0,0,0)');
+    baseGlow.addColorStop(1, 'rgba(0,20,40,0.06)');
+    ctx.fillStyle = baseGlow; ctx.fillRect(0, 0, cv.width, cv.height);
+
+    cols.forEach(c => {
+      const [r, g, b] = COLORS_BOREALIS[c.colorIdx];
+      const alphaPulse = c.o * (0.65 + Math.sin(t * c.vspeed + c.vphase) * 0.35);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, cv.height);
+      grad.addColorStop(0, `rgba(${r},${g},${b},0)`);
+      grad.addColorStop(0.2, `rgba(${r},${g},${b},${alphaPulse * 0.4})`);
+      grad.addColorStop(0.5, `rgba(${r},${g},${b},${alphaPulse})`);
+      grad.addColorStop(0.8, `rgba(${r},${g},${b},${alphaPulse * 0.3})`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+
+      ctx.beginPath();
+      ctx.moveTo(c.x, 0);
+      for (let y = 0; y <= cv.height; y += 6) {
+        const sx = c.x + Math.sin(t * c.speed + c.phase + y * 0.03) * c.amp;
+        ctx.lineTo(sx, y);
+      }
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = c.w;
+      ctx.stroke();
+    });
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

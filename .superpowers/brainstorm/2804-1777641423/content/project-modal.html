@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Modal Options</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#060606; color:#fafaf9; font-family:'Inter',sans-serif; padding:24px 20px 60px; }
+  h2 { font-size:20px; margin-bottom:6px; }
+  .sub { color:#a8a29e; font-size:13px; margin-bottom:28px; line-height:1.5; }
+
+  .options-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:680px){ .options-grid{ grid-template-columns:1fr; } }
+
+  .opt { border:1.5px solid #2a2a2a; border-radius:14px; overflow:hidden; cursor:pointer; transition:border-color .2s,transform .15s; }
+  .opt:hover { border-color:#555; transform:translateY(-2px); }
+  .opt.selected { border-color:#fafaf9; }
+
+  .opt-header { padding:12px 16px; background:#111; border-bottom:1px solid #1a1a1a; font-size:14px; font-weight:600; }
+  .opt-note { padding:8px 16px 12px; background:#111; font-size:11px; color:#a8a29e; line-height:1.5; }
+
+  /* shared card style */
+  .glass { background:rgba(17,17,17,0.8); border:1px solid #2a2a2a; border-radius:10px; }
+
+  /* ── OPTION A: FULL SCREEN OVERLAY ── */
+  .modal-a {
+    background:#0d0d0d;
+    padding:20px;
+    min-height:220px;
+    position:relative;
+    display:flex; gap:16px;
+  }
+  .modal-a .img-col {
+    width:45%; background:#1a1a1a; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    min-height:140px; font-size:11px; color:#44403c;
+    flex-shrink:0;
+    background: linear-gradient(135deg,#1a1a1a,#111);
+    overflow:hidden; position:relative;
+  }
+  .modal-a .img-col::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,0.6));
+  }
+  .modal-a .info-col { flex:1; display:flex; flex-direction:column; gap:8px; }
+  .modal-a .close-btn {
+    position:absolute; top:14px; right:14px;
+    width:24px; height:24px; border-radius:50%;
+    background:#2a2a2a; display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:#a8a29e; cursor:pointer;
+  }
+  .tag { display:inline-block; font-size:10px; padding:2px 8px; border-radius:4px; background:#1a1a1a; color:#a8a29e; margin:1px; }
+  .link-btn { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:5px 12px; border-radius:6px; }
+  .link-primary { background:#fafaf9; color:#0a0a0a; font-weight:600; }
+  .link-outline { border:1px solid #2a2a2a; color:#a8a29e; }
+
+  /* ── OPTION B: BOTTOM SHEET ── */
+  .modal-b {
+    background:#0d0d0d;
+    padding:0;
+    min-height:220px;
+    position:relative;
+    display:flex; flex-direction:column; justify-content:flex-end;
+  }
+  .modal-b .backdrop {
+    position:absolute; inset:0;
+    background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,0.5));
+  }
+  .modal-b .sheet {
+    position:relative; z-index:2;
+    background:#111; border-radius:12px 12px 0 0;
+    padding:14px 16px;
+    border-top:1px solid #2a2a2a;
+  }
+  .modal-b .handle { width:32px; height:3px; background:#2a2a2a; border-radius:2px; margin:0 auto 12px; }
+  .modal-b .sheet-row { display:flex; gap:12px; align-items:flex-start; }
+  .modal-b .sheet-thumb { width:60px; height:44px; border-radius:6px; background:#1a1a1a; flex-shrink:0;
+    background:linear-gradient(135deg,#222,#111); }
+  .modal-b .sheet-info { flex:1; }
+
+  /* ── OPTION C: SIDE PANEL ── */
+  .modal-c {
+    background:#0d0d0d;
+    padding:0;
+    min-height:220px;
+    position:relative;
+    display:flex;
+    overflow:hidden;
+  }
+  .modal-c .main-area {
+    flex:1; padding:16px; display:flex; flex-direction:column; gap:6px;
+  }
+  .modal-c .side-panel {
+    width:42%; background:#111; border-left:1px solid #1a1a1a;
+    padding:14px 12px; display:flex; flex-direction:column; gap:10px;
+  }
+  .modal-c .side-label { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#44403c; margin-bottom:2px; }
+  .modal-c .side-val { font-size:11px; color:#a8a29e; }
+  .modal-c .preview-img {
+    width:100%; height:80px; border-radius:7px;
+    background:linear-gradient(135deg,#1a1a1a,#111);
+    border:1px solid #2a2a2a;
+  }
+
+  /* card thumbnails used in grid */
+  .card-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:16px; background:#0a0a0a; }
+  .proj-card {
+    background:#111; border:1px solid #2a2a2a; border-radius:8px;
+    padding:10px; cursor:pointer;
+    transition:border-color .15s;
+    font-size:10px;
+  }
+  .proj-card:hover { border-color:#555; }
+  .proj-card .thumb { height:36px; border-radius:5px; background:linear-gradient(135deg,#1a1a1a,#0d0d0d); margin-bottom:6px; }
+  .proj-card .name { color:#fafaf9; font-weight:600; font-size:10px; }
+  .proj-card .stack { color:#44403c; font-size:9px; margin-top:2px; }
+
+  .arrow { font-size:10px; color:#44403c; margin:4px 0; }
+
+  .label { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#44403c; margin-bottom:4px; }
+  .title { font-size:15px; font-weight:700; color:#fafaf9; }
+  .desc { font-size:11px; color:#a8a29e; line-height:1.5; }
+
+  .selected-bar {
+    position:fixed; bottom:0; left:0; right:0;
+    background:#111; border-top:1px solid #2a2a2a;
+    padding:12px 24px; font-size:13px; font-weight:600;
+    text-align:center; opacity:0; transition:opacity .3s;
+  }
+  .selected-bar.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<h2>Project Modal — Layout Options</h2>
+<p class="sub">When you click a project card, it expands into this. All use Framer Motion <code style="background:#1a1a1a;padding:1px 5px;border-radius:3px;font-size:11px;">layoutId</code> shared transition. Click to select.</p>
+
+<div class="options-grid">
+
+  <!-- A: FULL OVERLAY -->
+  <div class="opt" onclick="pick(this,'A')">
+    <div class="opt-header">A — Full Screen Overlay</div>
+    <div style="background:#0a0a0a; padding:12px;">
+      <div class="card-grid" style="padding:0;margin-bottom:8px;gap:6px;display:grid;grid-template-columns:repeat(3,1fr);">
+        <div class="proj-card" style="border-color:#fafaf9;box-shadow:0 0 0 1px #fafaf9;">
+          <div class="thumb"></div>
+          <div class="name">Website Desa</div>
+          <div class="stack">Laravel · Bootstrap</div>
+        </div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Alamat Hutan</div><div class="stack">Laravel · Leaflet</div></div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Skripsi</div><div class="stack">Python · R</div></div>
+      </div>
+      <div class="arrow" style="text-align:center;">↓ click expands to →</div>
+      <div class="modal-a glass">
+        <div class="img-col">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a1a1a 0%,#0d0d0d 100%);display:flex;align-items:center;justify-content:center;font-size:10px;color:#333;">Project Image</div>
+        </div>
+        <div class="info-col">
+          <div class="label">Project</div>
+          <div class="title">Website Desa</div>
+          <div class="desc">Government village website with tourism and cultural information.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;">
+            <span class="tag">Laravel</span><span class="tag">Bootstrap</span><span class="tag">MySQL</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <span class="link-btn link-primary">↗ Live Site</span>
+            <span class="link-btn link-outline">⌥ GitHub</span>
+          </div>
+        </div>
+        <div class="close-btn">✕</div>
+      </div>
+    </div>
+    <div class="opt-note">Card smoothly expands to fill most of the screen. Image left, details right. Big, cinematic.</div>
+  </div>
+
+  <!-- B: BOTTOM SHEET -->
+  <div class="opt" onclick="pick(this,'B')">
+    <div class="opt-header">B — Bottom Sheet Slide Up</div>
+    <div style="background:#0a0a0a;padding:12px;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
+        <div class="proj-card" style="border-color:#fafaf9;"><div class="thumb"></div><div class="name">Website Desa</div><div class="stack">Laravel</div></div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Alamat Hutan</div><div class="stack">Laravel</div></div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Skripsi</div><div class="stack">Python</div></div>
+      </div>
+      <div class="arrow" style="text-align:center;">↓ card selected →</div>
+      <div class="modal-b glass" style="border-radius:10px;overflow:hidden;min-height:140px;">
+        <div class="backdrop" style="background:linear-gradient(180deg,rgba(13,13,13,0.3) 0%,rgba(0,0,0,0.6) 100%);position:relative;height:70px;display:flex;align-items:center;padding:0 14px;">
+          <div style="font-size:10px;color:#44403c;">📌 Website Desa · Laravel · Bootstrap</div>
+        </div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sheet-row">
+            <div class="sheet-thumb"></div>
+            <div class="sheet-info">
+              <div class="title" style="font-size:13px;">Website Desa</div>
+              <div class="desc" style="font-size:10px;margin-top:3px;">Government village website with tourism info.</div>
+              <div style="display:flex;gap:5px;margin-top:6px;">
+                <span class="link-btn link-primary" style="font-size:10px;">↗ Live</span>
+                <span class="link-btn link-outline" style="font-size:10px;">GitHub</span>
+                <span class="link-btn link-outline" style="font-size:10px;">⤓ PDF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="opt-note">Sheet slides up from the bottom. Cards stay visible behind. Mobile-native feeling.</div>
+  </div>
+
+  <!-- C: SIDE PANEL -->
+  <div class="opt" onclick="pick(this,'C')">
+    <div class="opt-header">C — Side Detail Panel</div>
+    <div style="background:#0a0a0a;padding:12px;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
+        <div class="proj-card" style="border-color:#fafaf9;"><div class="thumb"></div><div class="name">Website Desa</div><div class="stack">Laravel</div></div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Alamat Hutan</div><div class="stack">Laravel</div></div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Skripsi</div><div class="stack">Python</div></div>
+      </div>
+      <div class="arrow" style="text-align:center;">↓ click shows panel →</div>
+      <div class="modal-c glass" style="border-radius:10px;overflow:hidden;min-height:140px;">
+        <div class="main-area">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+            <div class="proj-card" style="border-color:#fafaf9;"><div class="thumb"></div><div class="name">Website Desa</div></div>
+            <div class="proj-card"><div class="thumb"></div><div class="name">Alamat Hutan</div></div>
+            <div class="proj-card"><div class="thumb"></div><div class="name">Skripsi</div></div>
+          </div>
+        </div>
+        <div class="side-panel">
+          <div class="preview-img"></div>
+          <div>
+            <div class="side-label">Project</div>
+            <div style="font-size:12px;font-weight:700;color:#fafaf9;">Website Desa</div>
+          </div>
+          <div>
+            <div class="side-label">Stack</div>
+            <div class="side-val">Laravel · Bootstrap · MySQL</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span class="link-btn link-primary" style="font-size:10px;justify-content:center;">↗ Live Site</span>
+            <span class="link-btn link-outline" style="font-size:10px;justify-content:center;">⤓ Download PDF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="opt-note">Panel slides in from the right. Cards stay fully visible. Great for browsing multiple projects.</div>
+  </div>
+
+  <!-- D: CENTERED CARD EXPAND -->
+  <div class="opt" onclick="pick(this,'D')">
+    <div class="opt-header">D — Centered Card Expand</div>
+    <div style="background:#0a0a0a;padding:12px;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
+        <div class="proj-card" style="border-color:#fafaf9;"><div class="thumb"></div><div class="name">Website Desa</div><div class="stack">Laravel</div></div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Alamat Hutan</div><div class="stack">Laravel</div></div>
+        <div class="proj-card"><div class="thumb"></div><div class="name">Skripsi</div><div class="stack">Python</div></div>
+      </div>
+      <div class="arrow" style="text-align:center;">↓ card floats to center →</div>
+      <div style="position:relative;background:#0d0d0d;border-radius:10px;padding:10px;border:1px solid #1a1a1a;">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);border-radius:10px;z-index:1;"></div>
+        <div style="position:relative;z-index:2;background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:12px;max-width:90%;margin:0 auto;">
+          <div style="height:60px;border-radius:7px;background:linear-gradient(135deg,#1a1a1a,#0d0d0d);margin-bottom:10px;"></div>
+          <div class="title" style="font-size:13px;margin-bottom:4px;">Website Desa</div>
+          <div class="desc" style="font-size:10px;margin-bottom:8px;">Government village website with tourism and cultural information. Built with Laravel.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;">
+            <span class="tag">Laravel</span><span class="tag">Bootstrap</span><span class="tag">MySQL</span>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <span class="link-btn link-primary" style="font-size:10px;">↗ Live Site</span>
+            <span class="link-btn link-outline" style="font-size:10px;">GitHub</span>
+            <span class="link-btn link-outline" style="font-size:10px;">⤓ PDF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="opt-note">Card lifts and expands to a centered popup with dimmed backdrop. Classic modal feel with shared layout animation.</div>
+  </div>
+
+</div>
+
+<div class="selected-bar" id="bar"></div>
+
+<script>
+function pick(el, name) {
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const labels = { A:'Full Screen Overlay', B:'Bottom Sheet', C:'Side Panel', D:'Centered Card Expand' };
+  const bar = document.getElementById('bar');
+  bar.textContent = '✓ Option ' + name + ' — ' + labels[name] + ' selected';
+  bar.classList.add('show');
+  setTimeout(() => bar.classList.remove('show'), 3000);
+  if (window.__superpowers_record) window.__superpowers_record({type:'click', choice: name.toLowerCase(), text: labels[name]});
+}
+</script>
+</body>
+</html>

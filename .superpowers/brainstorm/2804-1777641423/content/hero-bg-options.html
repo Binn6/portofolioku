@@ -1,0 +1,121 @@
+<h2>Hero Background — Which vibe fits best?</h2>
+<p class="subtitle">The hero will still have your name, title, and CTAs on top. This is about the animated background layer.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a;height:180px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">
+      <canvas id="stars-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:20px;">
+        <div style="font-family:serif;font-size:22px;color:#fafaf9;font-weight:700;margin-bottom:4px;">Mochsabil Em Abyan</div>
+        <div style="font-size:13px;color:#a8a29e;">Data Analyst & Web Developer</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Star Field</h3>
+      <p>Hundreds of tiny particles drifting slowly upward. Simple, timeless, space-like depth. Very lightweight.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a;height:180px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">
+      <canvas id="constellation-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:20px;">
+        <div style="font-family:serif;font-size:22px;color:#fafaf9;font-weight:700;margin-bottom:4px;">Mochsabil Em Abyan</div>
+        <div style="font-size:13px;color:#a8a29e;">Data Analyst & Web Developer</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Constellation Network</h3>
+      <p>Dots connected by lines when they're close — like a data graph. Moves on mouse. Feels analytical and tech.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a;height:180px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">
+      <div style="position:absolute;inset:0;">
+        <div style="position:absolute;top:-40px;left:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(250,250,249,0.06) 0%,transparent 70%);animation:pulse1 4s ease-in-out infinite;"></div>
+        <div style="position:absolute;bottom:-30px;right:-30px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(168,162,158,0.05) 0%,transparent 70%);animation:pulse2 6s ease-in-out infinite;"></div>
+        <div style="position:absolute;top:30px;right:60px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(250,250,249,0.04) 0%,transparent 70%);animation:pulse3 5s ease-in-out infinite;"></div>
+      </div>
+      <style>
+        @keyframes pulse1{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.15);opacity:1}}
+        @keyframes pulse2{0%,100%{transform:scale(1);opacity:0.4}50%{transform:scale(1.1);opacity:0.8}}
+        @keyframes pulse3{0%,100%{transform:scale(1) translateY(0);opacity:0.5}50%{transform:scale(1.2) translateY(-8px);opacity:0.9}}
+      </style>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:20px;">
+        <div style="font-family:serif;font-size:22px;color:#fafaf9;font-weight:700;margin-bottom:4px;">Mochsabil Em Abyan</div>
+        <div style="font-size:13px;color:#a8a29e;">Data Analyst & Web Developer</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Nebula Orbs</h3>
+      <p>Large soft glowing circles breathing in and out. Cosmic, atmospheric, premium feel. No mouse interaction, pure CSS.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Star Field (A)
+(function() {
+  const canvas = document.getElementById('stars-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const stars = Array.from({length: 80}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.2 + 0.3,
+    vy: -(Math.random() * 0.2 + 0.05),
+    o: Math.random() * 0.6 + 0.2
+  }));
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(250,250,249,${s.o})`;
+      ctx.fill();
+      s.y += s.vy;
+      if (s.y < 0) { s.y = canvas.height; s.x = Math.random()*canvas.width; }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Constellation (B)
+(function() {
+  const canvas = document.getElementById('constellation-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const dots = Array.from({length: 30}, () => ({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+    vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4
+  }));
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    dots.forEach(d => {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x<0||d.x>canvas.width) d.vx*=-1;
+      if (d.y<0||d.y>canvas.height) d.vy*=-1;
+      ctx.beginPath(); ctx.arc(d.x,d.y,1.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(250,250,249,0.6)'; ctx.fill();
+    });
+    for (let i=0;i<dots.length;i++) for (let j=i+1;j<dots.length;j++) {
+      const dx=dots[i].x-dots[j].x, dy=dots[i].y-dots[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if (dist<60) {
+        ctx.beginPath(); ctx.moveTo(dots[i].x,dots[i].y); ctx.lineTo(dots[j].x,dots[j].y);
+        ctx.strokeStyle=`rgba(250,250,249,${0.15*(1-dist/60)})`; ctx.lineWidth=0.5; ctx.stroke();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>

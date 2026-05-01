@@ -30,7 +30,7 @@ export const adminUpdateProfile = (data) => api.put('/admin/profile', data)
 export const adminUploadCv = (file) => {
   const form = new FormData()
   form.append('cv', file)
-  return api.put('/admin/cv', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  return api.post('/admin/cv', form, { headers: { 'Content-Type': 'multipart/form-data' } })
 }
 
 // Admin — skills
@@ -70,5 +70,15 @@ export const adminDeleteCertificate = (id) => api.delete(`/admin/certificates/${
 // Admin — messages
 export const adminGetMessages = () => api.get('/admin/messages')
 export const adminMarkRead = (id) => api.patch(`/admin/messages/${id}/read`)
+
+// Admin — chat
+export const adminGetConversations = () => api.get('/admin/chat')
+export const adminGetConversation = (sessionId) => api.get(`/admin/chat/${sessionId}`)
+export const adminReply = (sessionId, message) => api.post(`/admin/chat/${sessionId}/reply`, { message })
+export const adminDeleteConversation = (sessionId) => api.delete(`/admin/chat/${sessionId}`)
+
+// Public chat
+export const chatSend = (data) => api.post('/chat', data)
+export const chatPoll = (sessionId) => api.get(`/chat/${sessionId}`)
 
 export default api

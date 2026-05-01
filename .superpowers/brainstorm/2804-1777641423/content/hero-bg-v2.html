@@ -1,0 +1,186 @@
+<h2>Hero Background — Star Field Variations</h2>
+<p class="subtitle">All based on star field — pick the one that feels right, or describe what to change.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a;height:200px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">
+      <canvas id="c-a" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:20px;z-index:2;">
+        <div style="font-family:serif;font-size:22px;color:#fafaf9;font-weight:700;margin-bottom:4px;">Mochsabil Em Abyan</div>
+        <div style="font-size:13px;color:#a8a29e;">Data Analyst & Web Developer</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Depth Layers</h3>
+      <p>3 layers of stars at different speeds & sizes — near stars move fast & bright, far ones slow & dim. Creates a real sense of flying through space.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a;height:200px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">
+      <canvas id="c-b" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:20px;z-index:2;">
+        <div style="font-family:serif;font-size:22px;color:#fafaf9;font-weight:700;margin-bottom:4px;">Mochsabil Em Abyan</div>
+        <div style="font-size:13px;color:#a8a29e;">Data Analyst & Web Developer</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Shooting Stars</h3>
+      <p>Static star field with occasional streaks of light shooting across the screen. Calm most of the time, dramatic moments scattered throughout.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a;height:200px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">
+      <canvas id="c-c" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:20px;z-index:2;">
+        <div style="font-family:serif;font-size:22px;color:#fafaf9;font-weight:700;margin-bottom:4px;">Mochsabil Em Abyan</div>
+        <div style="font-size:13px;color:#a8a29e;">Data Analyst & Web Developer</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Twinkling + Nebula</h3>
+      <p>Stars that randomly twinkle (fade in/out), plus one large faint nebula glow behind the text. Mix of motion and atmosphere.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="d" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0a;height:200px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">
+      <canvas id="c-d" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:20px;z-index:2;">
+        <div style="font-family:serif;font-size:22px;color:#fafaf9;font-weight:700;margin-bottom:4px;">Mochsabil Em Abyan</div>
+        <div style="font-size:13px;color:#a8a29e;">Data Analyst & Web Developer</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>D — Warp Speed</h3>
+      <p>Stars fly outward from center like jumping to hyperspace — streaks radiating from behind your name. Very cinematic, bold entrance animation.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// --- A: DEPTH LAYERS ---
+(function(){
+  const cv = document.getElementById('c-a');
+  if(!cv) return;
+  cv.width = cv.offsetWidth; cv.height = cv.offsetHeight;
+  const ctx = cv.getContext('2d');
+  const layers = [
+    Array.from({length:60},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:0.4,vy:-0.12,o:Math.random()*0.3+0.1})),
+    Array.from({length:35},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:0.9,vy:-0.3,o:Math.random()*0.4+0.2})),
+    Array.from({length:15},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:1.6,vy:-0.65,o:Math.random()*0.4+0.5})),
+  ];
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    layers.forEach(layer => layer.forEach(s => {
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(250,250,249,${s.o})`; ctx.fill();
+      s.y+=s.vy; if(s.y<0){s.y=cv.height;s.x=Math.random()*cv.width;}
+    }));
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// --- B: SHOOTING STARS ---
+(function(){
+  const cv = document.getElementById('c-b');
+  if(!cv) return;
+  cv.width = cv.offsetWidth; cv.height = cv.offsetHeight;
+  const ctx = cv.getContext('2d');
+  const stars = Array.from({length:90},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1+0.3,o:Math.random()*0.5+0.1}));
+  let meteors = [];
+  function spawnMeteor(){
+    meteors.push({x:Math.random()*cv.width*0.7,y:0,len:Math.random()*60+40,speed:Math.random()*6+5,o:1,angle:Math.PI/5});
+    setTimeout(spawnMeteor, Math.random()*2500+1500);
+  }
+  spawnMeteor();
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(250,250,249,${s.o})`;ctx.fill();});
+    meteors = meteors.filter(m=>{
+      ctx.save();
+      ctx.translate(m.x,m.y);
+      ctx.rotate(m.angle);
+      const g=ctx.createLinearGradient(0,0,0,-m.len);
+      g.addColorStop(0,`rgba(250,250,249,${m.o})`);
+      g.addColorStop(1,'rgba(250,250,249,0)');
+      ctx.strokeStyle=g; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-m.len); ctx.stroke();
+      ctx.restore();
+      m.x+=Math.cos(m.angle)*m.speed; m.y+=Math.sin(m.angle)*m.speed; m.o-=0.025;
+      return m.o>0&&m.y<cv.height+100;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// --- C: TWINKLING + NEBULA ---
+(function(){
+  const cv = document.getElementById('c-c');
+  if(!cv) return;
+  cv.width = cv.offsetWidth; cv.height = cv.offsetHeight;
+  const ctx = cv.getContext('2d');
+  const stars = Array.from({length:100},()=>({
+    x:Math.random()*cv.width, y:Math.random()*cv.height,
+    r:Math.random()*1.2+0.3,
+    baseO:Math.random()*0.4+0.1,
+    phase:Math.random()*Math.PI*2,
+    speed:Math.random()*0.02+0.005
+  }));
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    // nebula glow behind center
+    const ng=ctx.createRadialGradient(cv.width*0.45,cv.height*0.5,10,cv.width*0.45,cv.height*0.5,cv.width*0.45);
+    ng.addColorStop(0,'rgba(168,162,158,0.04)');
+    ng.addColorStop(0.5,'rgba(250,250,249,0.02)');
+    ng.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=ng; ctx.fillRect(0,0,cv.width,cv.height);
+    stars.forEach(s=>{
+      const o=s.baseO+Math.sin(t*s.speed+s.phase)*s.baseO*0.8;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(250,250,249,${Math.max(0,o)})`; ctx.fill();
+    });
+    t++; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// --- D: WARP SPEED ---
+(function(){
+  const cv = document.getElementById('c-d');
+  if(!cv) return;
+  cv.width = cv.offsetWidth; cv.height = cv.offsetHeight;
+  const ctx = cv.getContext('2d');
+  const cx=cv.width/2, cy=cv.height/2;
+  const stars = Array.from({length:120},()=>({
+    angle:Math.random()*Math.PI*2,
+    dist:Math.random()*Math.min(cx,cy)*0.3,
+    speed:Math.random()*1.5+0.5,
+    maxDist:Math.min(cx,cy)*1.4,
+    o:Math.random()*0.5+0.2
+  }));
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    stars.forEach(s=>{
+      const x1=cx+Math.cos(s.angle)*s.dist;
+      const y1=cy+Math.sin(s.angle)*s.dist;
+      s.dist+=s.speed*(s.dist/80+0.5);
+      const x2=cx+Math.cos(s.angle)*s.dist;
+      const y2=cy+Math.sin(s.angle)*s.dist;
+      const len=Math.hypot(x2-x1,y2-y1);
+      const alpha=Math.min(1,(s.dist/(Math.min(cx,cy)*0.4)))*s.o;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.strokeStyle=`rgba(250,250,249,${alpha})`; ctx.lineWidth=Math.min(1.5,s.dist/60); ctx.stroke();
+      if(s.dist>s.maxDist){s.dist=Math.random()*Math.min(cx,cy)*0.15; s.angle=Math.random()*Math.PI*2;}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>

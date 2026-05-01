@@ -11,6 +11,8 @@ import Education from './pages/admin/Education'
 import Certificates from './pages/admin/Certificates'
 import CV from './pages/admin/CV'
 import Messages from './pages/admin/Messages'
+import AdminProfile from './pages/admin/Profile'
+import AdminChat from './pages/admin/Chat'
 
 export default function App() {
   return (
@@ -27,7 +29,9 @@ export default function App() {
           <Route path="/admin/education" element={<RequireAuth><Education /></RequireAuth>} />
           <Route path="/admin/certificates" element={<RequireAuth><Certificates /></RequireAuth>} />
           <Route path="/admin/cv" element={<RequireAuth><CV /></RequireAuth>} />
+          <Route path="/admin/chat" element={<RequireAuth><AdminChat /></RequireAuth>} />
           <Route path="/admin/messages" element={<RequireAuth><Messages /></RequireAuth>} />
+          <Route path="/admin/profile" element={<RequireAuth><AdminProfile /></RequireAuth>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

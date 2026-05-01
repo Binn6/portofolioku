@@ -13,6 +13,7 @@ import Experience from '../components/sections/Experience'
 import Education from '../components/sections/Education'
 import Certificates from '../components/sections/Certificates'
 import Contact from '../components/sections/Contact'
+import ChatWidget from '../components/ui/ChatWidget'
 
 export default function Portfolio() {
   const [data, setData] = useState({})
@@ -72,6 +73,7 @@ export default function Portfolio() {
         <Contact profile={data.profile} />
       </main>
       <Footer profile={data.profile} />
+      <ChatWidget />
     </>
   )
 }

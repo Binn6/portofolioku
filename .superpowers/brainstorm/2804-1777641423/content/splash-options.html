@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Splash Screen Options</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#060606; color:#fafaf9; font-family:'Inter',sans-serif; padding:24px 20px 80px; }
+  h2 { font-size:20px; margin-bottom:6px; }
+  .sub { color:#a8a29e; font-size:13px; margin-bottom:28px; line-height:1.5; }
+
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:680px){ .grid{ grid-template-columns:1fr; } }
+
+  .opt { border:1.5px solid #2a2a2a; border-radius:14px; overflow:hidden; cursor:pointer; transition:border-color .2s,transform .15s; }
+  .opt:hover { border-color:#555; transform:translateY(-2px); }
+  .opt.selected { border-color:#fafaf9; }
+  .opt-header { padding:11px 16px; background:#111; border-bottom:1px solid #1a1a1a; font-size:13px; font-weight:600; }
+  .opt-note { padding:8px 16px 14px; background:#111; font-size:11px; color:#a8a29e; line-height:1.5; }
+
+  .preview { height:220px; background:#0a0a0a; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+
+  /* progress bar shared */
+  .progress-bar { position:absolute; bottom:0; left:0; right:0; height:2px; background:#1a1a1a; }
+  .progress-fill { height:100%; background:#fafaf9; animation:fillbar 2s ease-in-out infinite; }
+  @keyframes fillbar { 0%{width:0} 70%{width:100%} 100%{width:100%;opacity:0} }
+
+  /* A: Morphing letters */
+  .morph-wrap { display:flex; gap:6px; }
+  .morph-letter {
+    font-family:Georgia,serif; font-size:72px; font-weight:700; color:#fafaf9;
+    animation:morphLetter 2s ease-in-out infinite;
+    display:block; line-height:1;
+  }
+  .morph-letter:nth-child(2) { animation-delay:.15s; color:#a8a29e; }
+  @keyframes morphLetter {
+    0%,100% { transform:scaleY(1) scaleX(1); opacity:.9; }
+    25% { transform:scaleY(1.08) scaleX(0.95); opacity:1; }
+    50% { transform:scaleY(0.94) scaleX(1.04); opacity:.85; }
+    75% { transform:scaleY(1.04) scaleX(0.97); opacity:1; }
+  }
+
+  /* B: Rotating ring SVG */
+  .ring-wrap { position:relative; width:120px; height:120px; display:flex; align-items:center; justify-content:center; }
+  .ring-wrap svg { position:absolute; inset:0; animation:rotateSvg 2.5s linear infinite; }
+  .ring-wrap svg:nth-child(2) { animation:rotateSvg 1.8s linear infinite reverse; width:80%; height:80%; top:10%; left:10%; opacity:.5; }
+  .ring-center { font-family:Georgia,serif; font-size:28px; font-weight:700; color:#fafaf9; z-index:2; }
+  @keyframes rotateSvg { to { transform:rotate(360deg); } }
+
+  /* C: Glitch */
+  .glitch-wrap { position:relative; }
+  .glitch-text {
+    font-family:Georgia,serif; font-size:72px; font-weight:700; color:#fafaf9;
+    position:relative; animation:glitch-main 3s infinite;
+  }
+  .glitch-text::before, .glitch-text::after {
+    content:attr(data-text); position:absolute; top:0; left:0;
+    font-family:Georgia,serif; font-size:72px; font-weight:700;
+  }
+  .glitch-text::before {
+    color:#ff4500; clip-path:polygon(0 0,100% 0,100% 35%,0 35%);
+    animation:glitch-top 3s infinite; opacity:.8;
+  }
+  .glitch-text::after {
+    color:#ffd700; clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);
+    animation:glitch-bot 3s infinite; opacity:.8;
+  }
+  @keyframes glitch-main { 0%,89%,100%{transform:none} 90%{transform:skewX(-2deg)} 92%{transform:skewX(2deg)} 94%{transform:none} }
+  @keyframes glitch-top { 0%,89%,100%{transform:none} 90%{transform:translate(-3px,0)} 92%{transform:translate(3px,0)} 94%{transform:none} }
+  @keyframes glitch-bot { 0%,89%,100%{transform:none} 90%{transform:translate(3px,0)} 92%{transform:translate(-3px,0)} 94%{transform:none} }
+
+  /* D: Particle burst from initials */
+  .burst-wrap { position:relative; display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
+  .burst-letter { font-family:Georgia,serif; font-size:72px; font-weight:700; color:#fafaf9; z-index:2; animation:breathe 2s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{transform:scale(1);text-shadow:0 0 0px rgba(250,250,249,0)} 50%{transform:scale(1.05);text-shadow:0 0 40px rgba(250,250,249,0.3)} }
+  canvas.burst { position:absolute; inset:0; width:100%; height:100%; }
+
+  /* E: Fire splash (ties with hero) */
+  .fire-wrap { position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  canvas.fire-bg { position:absolute; inset:0; width:100%; height:100%; }
+  .fire-initials {
+    font-family:Georgia,serif; font-size:72px; font-weight:700; z-index:2;
+    background:linear-gradient(180deg,#ffd700,#ff6600,#ff2200);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    animation:fireGlow 1.5s ease-in-out infinite alternate;
+  }
+  @keyframes fireGlow {
+    from { filter:drop-shadow(0 0 8px rgba(255,100,0,0.6)); }
+    to { filter:drop-shadow(0 0 24px rgba(255,200,0,0.9)); }
+  }
+
+  .selected-bar { position:fixed; bottom:0; left:0; right:0; background:#111; border-top:1px solid #2a2a2a; padding:12px 24px; font-size:13px; font-weight:600; text-align:center; opacity:0; transition:opacity .3s; }
+  .selected-bar.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<h2>Splash Screen — Upgrade Options</h2>
+<p class="sub">Replaces the plain "MA" fade-in. All loop so you can see the full animation. Progress bar stays at the bottom.</p>
+
+<div class="grid">
+
+  <!-- A: MORPHING LETTERS -->
+  <div class="opt" onclick="pick(this,'A')">
+    <div class="opt-header">A — Morphing Letters</div>
+    <div class="preview">
+      <div class="morph-wrap">
+        <span class="morph-letter">M</span>
+        <span class="morph-letter">A</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+    <div class="opt-note">M and A breathe and morph — squash & stretch like a living logo. Simple but dynamic.</div>
+  </div>
+
+  <!-- B: ROTATING RINGS -->
+  <div class="opt" onclick="pick(this,'B')">
+    <div class="opt-header">B — Orbiting Rings</div>
+    <div class="preview">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="46" stroke="rgba(250,250,249,0.25)" stroke-width="1.5" stroke-dasharray="12 8"/>
+        </svg>
+        <svg viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="46" stroke="rgba(250,250,249,0.15)" stroke-width="1" stroke-dasharray="4 16"/>
+        </svg>
+        <span class="ring-center">MA</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+    <div class="opt-note">Two dashed rings orbit in opposite directions around the initials. Clean and techy.</div>
+  </div>
+
+  <!-- C: GLITCH -->
+  <div class="opt" onclick="pick(this,'C')">
+    <div class="opt-header">C — Glitch Effect</div>
+    <div class="preview">
+      <div class="glitch-wrap">
+        <span class="glitch-text" data-text="MA">MA</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+    <div class="opt-note">Initials glitch with fire colors (red & gold) every few seconds. Subtle most of the time, dramatic when it fires.</div>
+  </div>
+
+  <!-- D: PARTICLE BURST -->
+  <div class="opt" onclick="pick(this,'D')">
+    <div class="opt-header">D — Particle Burst</div>
+    <div class="preview">
+      <div class="burst-wrap">
+        <canvas class="burst" id="burst-canvas"></canvas>
+        <span class="burst-letter">MA</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+    <div class="opt-note">Tiny particles continuously radiate outward from behind the initials like an energy field.</div>
+  </div>
+
+  <!-- E: FIRE SPLASH -->
+  <div class="opt" onclick="pick(this,'E')" style="grid-column:1/-1;">
+    <div class="opt-header">E — Fire Aurora (matches hero) ⭐ Recommended</div>
+    <div class="preview" style="height:200px;">
+      <div class="fire-wrap">
+        <canvas class="fire-bg" id="fire-canvas"></canvas>
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 30%,rgba(0,0,0,0.7) 100%);z-index:1;"></div>
+        <span class="fire-initials" style="z-index:2;">MA</span>
+      </div>
+      <div class="progress-bar" style="z-index:3;"><div class="progress-fill"></div></div>
+    </div>
+    <div class="opt-note">Aurora fire curtains behind the initials — same animation as the hero, so the transition from splash → hero feels seamless and intentional. Gold gradient on the letters ties it together.</div>
+  </div>
+
+</div>
+
+<div class="selected-bar" id="bar"></div>
+
+<script>
+// PARTICLE BURST
+(function(){
+  const cv = document.getElementById('burst-canvas');
+  if (!cv) return;
+  const r = () => { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; };
+  r(); window.addEventListener('resize', r);
+  const ctx = cv.getContext('2d');
+  const cx = () => cv.width/2, cy = () => cv.height/2;
+  let particles = [];
+  const spawn = () => {
+    const angle = Math.random()*Math.PI*2;
+    const speed = Math.random()*1.2+0.3;
+    particles.push({ x:cx(), y:cy(), vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, life:1, r:Math.random()*1.5+0.5 });
+  };
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(t%2===0) { spawn(); spawn(); }
+    particles = particles.filter(p => {
+      p.x+=p.vx; p.y+=p.vy; p.life-=0.018;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(250,250,249,${p.life*0.6})`; ctx.fill();
+      return p.life > 0;
+    });
+    t++; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// FIRE AURORA BEHIND INITIALS
+(function(){
+  const cv = document.getElementById('fire-canvas');
+  if(!cv) return;
+  const resize = () => { cv.width=cv.offsetWidth; cv.height=cv.offsetHeight; };
+  resize();
+  const ctx = cv.getContext('2d');
+  const FIRE = [[255,40,0],[255,100,0],[255,160,0],[255,200,20],[220,30,10]];
+  const cols = Array.from({length:18},(_,i)=>({
+    x:(i/17)*cv.width, phase:Math.random()*Math.PI*2,
+    speed:Math.random()*.007+.003, amp:Math.random()*22+10,
+    ci:Math.floor(Math.random()*FIRE.length),
+    o:Math.random()*.2+.06, w:Math.random()*2.5+1,
+    vphase:Math.random()*Math.PI*2, vspeed:Math.random()*.005+.002
+  }));
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    cols.forEach(c=>{
+      const [r,g,b]=FIRE[c.ci];
+      const ap=c.o*(0.7+Math.sin(t*c.vspeed+c.vphase)*0.3);
+      const grad=ctx.createLinearGradient(0,0,0,cv.height);
+      grad.addColorStop(0,`rgba(${r},${g},${b},0)`);
+      grad.addColorStop(0.15,`rgba(${r},${g},${b},${ap*.3})`);
+      grad.addColorStop(0.45,`rgba(${r},${g},${b},${ap})`);
+      grad.addColorStop(0.75,`rgba(${r},${g},${b},${ap*.4})`);
+      grad.addColorStop(1,`rgba(${r},${g},${b},0)`);
+      ctx.beginPath(); ctx.moveTo(c.x,0);
+      for(let y=0;y<=cv.height;y+=6){
+        const sx=c.x+Math.sin(t*c.speed+c.phase+y*.035)*c.amp;
+        ctx.lineTo(sx,y);
+      }
+      ctx.strokeStyle=grad; ctx.lineWidth=c.w; ctx.stroke();
+    });
+    t++; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+function pick(el, name) {
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const labels = {A:'Morphing Letters',B:'Orbiting Rings',C:'Glitch Effect',D:'Particle Burst',E:'Fire Aurora'};
+  const bar = document.getElementById('bar');
+  bar.textContent = '✓ Option '+name+' — '+labels[name]+' selected';
+  bar.classList.add('show');
+  setTimeout(()=>bar.classList.remove('show'),3000);
+  if(window.__superpowers_record) window.__superpowers_record({type:'click',choice:name.toLowerCase(),text:labels[name]});
+}
+</script>
+</body>
+</html>

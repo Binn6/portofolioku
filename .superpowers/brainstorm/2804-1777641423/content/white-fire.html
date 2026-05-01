@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>White Fire Splash</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#060606; color:#fafaf9; font-family:'Inter',sans-serif; padding:24px 20px 80px; }
+  h2 { font-size:20px; margin-bottom:6px; }
+  .sub { color:#a8a29e; font-size:13px; margin-bottom:28px; line-height:1.5; }
+
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:680px){ .grid{ grid-template-columns:1fr; } }
+
+  .opt { border:1.5px solid #2a2a2a; border-radius:14px; overflow:hidden; cursor:pointer; transition:border-color .2s,transform .15s; }
+  .opt:hover { border-color:#555; transform:translateY(-2px); }
+  .opt.selected { border-color:#fafaf9; }
+  .opt-header { padding:11px 16px; background:#111; border-bottom:1px solid #1a1a1a; font-size:13px; font-weight:600; }
+  .opt-note { padding:8px 16px 14px; background:#111; font-size:11px; color:#a8a29e; line-height:1.5; }
+
+  .preview { height:240px; background:#080808; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+
+  .initials {
+    font-family:Georgia,serif; font-size:80px; font-weight:700;
+    position:relative; z-index:10;
+    text-shadow: 0 0 40px rgba(255,255,255,0.4);
+  }
+
+  .progress-bar { position:absolute; bottom:0; left:0; right:0; height:2px; background:#111; z-index:20; }
+  .progress-fill { height:100%; animation:fillbar 2.2s ease-in-out infinite; }
+  @keyframes fillbar { 0%{width:0;opacity:1} 80%{width:100%;opacity:1} 100%{width:100%;opacity:0} }
+
+  .selected-bar { position:fixed; bottom:0; left:0; right:0; background:#111; border-top:1px solid #2a2a2a; padding:12px 24px; font-size:13px; font-weight:600; text-align:center; opacity:0; transition:opacity .3s; }
+  .selected-bar.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<h2>White Fire — Variations</h2>
+<p class="sub">Same aurora curtain animation, but in white tones. Pick the tint that feels right.</p>
+
+<div class="grid">
+
+  <!-- A: PURE WHITE -->
+  <div class="opt" onclick="pick(this,'A')">
+    <div class="opt-header">A — Pure White</div>
+    <div class="preview" id="prev-a">
+      <canvas id="ca" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 20%,rgba(0,0,0,0.75) 100%);z-index:5;"></div>
+      <span class="initials" style="color:#ffffff;">MA</span>
+      <div class="progress-bar"><div class="progress-fill" style="background:#ffffff;"></div></div>
+    </div>
+    <div class="opt-note">Stark white curtains — like white flames or smoke. Very clean, minimal. Strong contrast on black.</div>
+  </div>
+
+  <!-- B: WARM WHITE (slightly golden) -->
+  <div class="opt" onclick="pick(this,'B')">
+    <div class="opt-header">B — Warm White</div>
+    <div class="preview" id="prev-b">
+      <canvas id="cb" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 20%,rgba(0,0,0,0.75) 100%);z-index:5;"></div>
+      <span class="initials" style="color:#fafaf9;">MA</span>
+      <div class="progress-bar"><div class="progress-fill" style="background:#fafaf9;"></div></div>
+    </div>
+    <div class="opt-note">Off-white with a very subtle warm tint — cream and ivory. Matches your design tokens exactly (accent: #fafaf9).</div>
+  </div>
+
+  <!-- C: SILVER BLUE -->
+  <div class="opt" onclick="pick(this,'C')">
+    <div class="opt-header">C — Silver Blue</div>
+    <div class="preview" id="prev-c">
+      <canvas id="cc" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 20%,rgba(0,0,0,0.75) 100%);z-index:5;"></div>
+      <span class="initials" style="color:#e8f4f8;">MA</span>
+      <div class="progress-bar"><div class="progress-fill" style="background:#e8f4f8;"></div></div>
+    </div>
+    <div class="opt-note">White curtains with a cool icy-blue tint. Like arctic fire or lightning — ethereal and electric.</div>
+  </div>
+
+  <!-- D: WHITE + GHOST GOLD -->
+  <div class="opt" onclick="pick(this,'D')">
+    <div class="opt-header">D — White + Ghost Gold</div>
+    <div class="preview" id="prev-d">
+      <canvas id="cd" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 20%,rgba(0,0,0,0.75) 100%);z-index:5;"></div>
+      <span class="initials" style="color:#fafaf9;text-shadow:0 0 30px rgba(255,220,100,0.5);">MA</span>
+      <div class="progress-bar"><div class="progress-fill" style="background:linear-gradient(90deg,#fff,#ffe87a);"></div></div>
+    </div>
+    <div class="opt-note">Mostly white curtains with a few ghost-gold strands woven in. Subtle luxury — 90% white, 10% gold accent.</div>
+  </div>
+
+</div>
+
+<div class="selected-bar" id="bar"></div>
+
+<script>
+function makeAurora(canvasId, colors) {
+  const cv = document.getElementById(canvasId);
+  if (!cv) return;
+  const resize = () => { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; };
+  resize();
+  const ctx = cv.getContext('2d');
+  const cols = Array.from({length: 24}, (_, i) => ({
+    x: (i / 23) * cv.width,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.007 + 0.003,
+    amp: Math.random() * 22 + 10,
+    ci: Math.floor(Math.random() * colors.length),
+    o: Math.random() * 0.22 + 0.07,
+    w: Math.random() * 2.8 + 1,
+    vphase: Math.random() * Math.PI * 2,
+    vspeed: Math.random() * 0.005 + 0.002,
+  }));
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    cols.forEach(c => {
+      const [r, g, b] = colors[c.ci];
+      const ap = c.o * (0.65 + Math.sin(t * c.vspeed + c.vphase) * 0.35);
+      const grad = ctx.createLinearGradient(0, 0, 0, cv.height);
+      grad.addColorStop(0,    `rgba(${r},${g},${b},0)`);
+      grad.addColorStop(0.15, `rgba(${r},${g},${b},${ap * 0.3})`);
+      grad.addColorStop(0.45, `rgba(${r},${g},${b},${ap})`);
+      grad.addColorStop(0.75, `rgba(${r},${g},${b},${ap * 0.4})`);
+      grad.addColorStop(1,    `rgba(${r},${g},${b},0)`);
+      ctx.beginPath();
+      ctx.moveTo(c.x, 0);
+      for (let y = 0; y <= cv.height; y += 6) {
+        const sx = c.x + Math.sin(t * c.speed + c.phase + y * 0.035) * c.amp;
+        ctx.lineTo(sx, y);
+      }
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = c.w;
+      ctx.stroke();
+    });
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// A — Pure White
+makeAurora('ca', [
+  [255, 255, 255],
+  [240, 240, 240],
+  [220, 220, 220],
+  [255, 255, 255],
+]);
+
+// B — Warm White (cream / ivory)
+makeAurora('cb', [
+  [250, 250, 249],  // accent token
+  [245, 240, 230],  // ivory
+  [255, 252, 245],  // near white warm
+  [235, 228, 218],  // warm grey
+]);
+
+// C — Silver Blue
+makeAurora('cc', [
+  [220, 238, 255],  // ice blue
+  [200, 225, 255],  // pale blue
+  [240, 248, 255],  // alice blue
+  [180, 210, 245],  // steel blue tint
+  [255, 255, 255],  // white
+]);
+
+// D — White + Ghost Gold
+makeAurora('cd', [
+  [255, 255, 255],   // white
+  [255, 255, 255],   // white
+  [255, 250, 220],   // ghost gold
+  [255, 245, 180],   // pale gold
+  [255, 255, 255],   // white
+  [250, 250, 249],   // warm white
+]);
+
+function pick(el, name) {
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const labels = { A:'Pure White', B:'Warm White', C:'Silver Blue', D:'White + Ghost Gold' };
+  const bar = document.getElementById('bar');
+  bar.textContent = '✓ Option ' + name + ' — ' + labels[name] + ' selected';
+  bar.classList.add('show');
+  setTimeout(() => bar.classList.remove('show'), 3000);
+  if (window.__superpowers_record) window.__superpowers_record({type:'click', choice:name.toLowerCase(), text:labels[name]});
+}
+</script>
+</body>
+</html>

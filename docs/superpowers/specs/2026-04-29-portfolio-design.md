@@ -49,22 +49,24 @@ portofolio/                   ← git root
 | Collection | Purpose |
 |---|---|
 | `users` | Admin credentials |
-| `profiles` | Owner profile data |
+| `profiles` | Owner profile data + CV file path |
 | `skills` | Skill list with category + level |
 | `projects` | Portfolio projects with images |
 | `experiences` | Work/internship/org experience |
 | `education` | Education history |
+| `certificates` | Certificates with title, issuer, date, category, image/PDF |
 | `contacts` | Contact form submissions |
 
 ### API Routes
 
 **Public endpoints:**
 ```
-GET  /api/profile
+GET  /api/profile         ← includes cv_url field
 GET  /api/skills
 GET  /api/projects
 GET  /api/experiences
 GET  /api/education
+GET  /api/certificates
 POST /api/contact
 ```
 
@@ -80,13 +82,18 @@ GET|POST|PUT|DELETE  /api/admin/skills/{id?}
 GET|POST|PUT|DELETE  /api/admin/projects/{id?}   ← image upload
 GET|POST|PUT|DELETE  /api/admin/experiences/{id?}
 GET|POST|PUT|DELETE  /api/admin/education/{id?}
+GET|POST|PUT|DELETE  /api/admin/certificates/{id?}  ← image/PDF upload
+PUT                  /api/admin/cv                   ← upload CV PDF
 ```
 
-### Image Handling
-- Storage: `storage/app/public/projects/`
-- Public URL: `/storage/projects/filename.webp`
+### File Storage
+| Type | Storage Path | Public URL | Validation |
+|---|---|---|---|
+| Project thumbnail | `storage/app/public/projects/` | `/storage/projects/file.webp` | `jpeg,png,webp`, max 2MB |
+| Certificate image/PDF | `storage/app/public/certificates/` | `/storage/certificates/file.pdf` | `jpeg,png,webp,pdf`, max 5MB |
+| CV/Resume PDF | `storage/app/public/cv/` | `/storage/cv/cv.pdf` | `pdf`, max 5MB |
+
 - Symlink: `php artisan storage:link`
-- Validation: `mimes:jpeg,png,webp`, `max:2048`
 
 ### Folder Structure
 ```
@@ -169,6 +176,8 @@ colors: {
 /admin/skills
 /admin/experiences
 /admin/education
+/admin/certificates
+/admin/cv
 /admin/messages
 ```
 
@@ -181,13 +190,14 @@ A full-screen loading screen shown on initial page load while all API data is fe
 
 ### Page Sections (single-page portfolio)
 0. `SplashScreen` — full-screen loader, dismissed after all API calls resolve
-1. `Hero` — name, title, CTA buttons, profile photo
+1. `Hero` — name, title, CTA buttons (including Download CV), profile photo
 2. `About` — bio paragraph, photo, key facts
 3. `Skills` — categorized skill badges with level indicator
 4. `Projects` — filterable card grid with thumbnail
 5. `Experience` — animated vertical timeline
 6. `Education` — education card
-7. `Contact` — contact form + social links
+7. `Certificates` — certificate cards with category filter (Web / Data), click to view image or download PDF
+8. `Contact` — contact form + social links
 
 ### Reusable Components
 
@@ -231,7 +241,7 @@ frontend/
 │   ├── components/
 │   │   ├── animations/        ← AnimatedSection, RevealText, etc.
 │   │   ├── layout/            ← Navbar, Footer, Container, etc.
-│   │   ├── sections/          ← Hero, About, Skills, Projects, etc.
+│   │   ├── sections/          ← Hero, About, Skills, Projects, Experience, Education, Certificates, Contact
 │   │   ├── admin/             ← AdminLayout, AdminSidebar, etc.
 │   │   └── ui/                ← GlassCard, SectionTitle, Buttons
 │   ├── pages/
@@ -243,6 +253,8 @@ frontend/
 │   │       ├── Skills.jsx
 │   │       ├── Experiences.jsx
 │   │       ├── Education.jsx
+│   │       ├── Certificates.jsx
+│   │       ├── CV.jsx
 │   │       └── Messages.jsx
 │   ├── hooks/
 │   │   ├── useAuth.js
@@ -267,10 +279,15 @@ frontend/
 A minimal, clean dark dashboard for content management. Protected by Sanctum token auth.
 
 **Features:**
-- Login page (email + password → receives Bearer token)
-- Dashboard overview (message count, project count, quick links)
-- CRUD for: Projects (with image upload), Skills, Experiences, Education
-- View contact messages (read-only inbox)
+- Login page (username or email + password → receives Bearer token)
+- Dashboard overview (counts: projects, skills, certificates, unread messages)
+- CRUD — Projects: title, description, tech stack tags, thumbnail upload, GitHub URL, live URL, is_featured toggle
+- CRUD — Skills: name, category (Languages/Frameworks/Data/Tools/Soft Skills), level (1-5)
+- CRUD — Experiences: title, company, type (internship/organization), start_date, end_date, description, is_current
+- CRUD — Education: institution, degree, field, start_year, end_year, description
+- CRUD — Certificates: title, issuer, date, category (Web/Data), file upload (image or PDF)
+- CV Upload: replace the downloadable CV PDF (single file, always named `cv.pdf`)
+- View contact messages (read-only inbox, mark as read)
 - Logout
 
 **UI:** Admin uses the same design system (dark, warm white) with a collapsible sidebar. Framer Motion for sidebar open/close and page transitions.
