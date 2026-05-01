@@ -21,9 +21,7 @@ class AdminCvController extends Controller
 
         $path = $request->file('cv')->storeAs('cv', 'cv.pdf', 'public');
 
-        if ($profile) {
-            $profile->update(['cv_path' => $path]);
-        }
+        Profile::updateOrCreate([], ['cv_path' => $path]);
 
         return response()->json(['cv_url' => url('storage/' . $path)]);
     }

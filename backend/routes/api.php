@@ -27,7 +27,7 @@ Route::get('/certificates', [CertificateController::class, 'index']);
 Route::post('/contact', [ContactController::class, 'store']);
 
 // Auth
-Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 // Admin (protected)
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
