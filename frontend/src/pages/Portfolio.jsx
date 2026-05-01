@@ -5,6 +5,7 @@ import ScrollProgressBar from '../components/animations/ScrollProgressBar'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import Hero from '../components/sections/Hero'
+import Ticker from '../components/ui/Ticker'
 import About from '../components/sections/About'
 import Skills from '../components/sections/Skills'
 import Projects from '../components/sections/Projects'
@@ -61,6 +62,7 @@ export default function Portfolio() {
       <Navbar />
       <main>
         <Hero profile={data.profile} />
+        <Ticker />
         <About profile={data.profile} />
         <Skills skills={data.skills} />
         <Projects projects={data.projects} />

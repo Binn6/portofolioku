@@ -2,6 +2,15 @@ import { useEffect, useRef } from 'react'
 import { Download, Code2, Briefcase, Mail } from 'lucide-react'
 import { gsap, prefersReducedMotion } from '../../animations/gsap'
 import MotionButton from '../ui/MotionButton'
+import AuroraCanvas from '../ui/AuroraCanvas'
+
+const FIRE_COLORS = [
+  [255, 40, 0],
+  [255, 100, 0],
+  [255, 160, 0],
+  [255, 200, 20],
+  [220, 30, 10],
+]
 
 export default function Hero({ profile }) {
   const containerRef = useRef(null)
@@ -17,8 +26,13 @@ export default function Hero({ profile }) {
   }, [])
 
   return (
-    <section className="min-h-screen flex items-center pt-16">
-      <div ref={containerRef} className="max-w-6xl mx-auto px-6 w-full">
+    <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+      <AuroraCanvas colors={FIRE_COLORS} columnCount={22} />
+      <div
+        className="absolute inset-0 z-[1]"
+        style={{ background: 'radial-gradient(ellipse at center, rgba(10,10,10,0) 20%, rgba(10,10,10,0.88) 100%)' }}
+      />
+      <div ref={containerRef} className="relative z-[2] max-w-6xl mx-auto px-6 w-full">
         <p data-hero className="text-sm text-accent-muted uppercase tracking-widest mb-4 opacity-0">
           Hello, I am
         </p>
