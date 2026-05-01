@@ -9,6 +9,7 @@ class PersonalAccessToken extends \Laravel\Sanctum\PersonalAccessToken
 
     protected $connection = 'mongodb';
     protected $collection = 'personal_access_tokens';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'name', 'token', 'abilities', 'expires_at',
