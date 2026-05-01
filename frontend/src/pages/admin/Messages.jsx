@@ -9,11 +9,13 @@ export default function Messages() {
   const [list, setList] = useState(null)
 
   const items = list ?? messages ?? []
+  const getId = (m) => m.id ?? m._id  // Laravel MongoDB serializes _id as id in JSON
 
-  const markRead = async (id) => {
+  const markRead = async (m) => {
+    const id = getId(m)
     try {
       await adminMarkRead(id)
-      setList(items.map((m) => (String(m._id) === String(id) ? { ...m, is_read: true } : m)))
+      setList(items.map((item) => (getId(item) === id ? { ...item, is_read: true } : item)))
     } catch {
       // silent — button stays visible so user can retry
     }
@@ -27,7 +29,7 @@ export default function Messages() {
       ) : (
         <div className="space-y-3">
           {items.map((m) => (
-            <div key={m._id} className={`glass rounded-xl p-5 ${!m.is_read ? 'border-accent-dim' : ''}`}>
+            <div key={getId(m)} className={`glass rounded-xl p-5 ${!m.is_read ? 'border-accent-dim' : ''}`}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-2">
                   {m.is_read ? <MailOpen size={16} className="text-accent-dim" /> : <Mail size={16} className="text-accent" />}
@@ -37,7 +39,7 @@ export default function Messages() {
                   </div>
                 </div>
                 {!m.is_read && (
-                  <button onClick={() => markRead(m._id)} className="text-xs text-accent-muted hover:text-accent shrink-0">
+                  <button onClick={() => markRead(m)} className="text-xs text-accent-muted hover:text-accent shrink-0">
                     Mark read
                   </button>
                 )}

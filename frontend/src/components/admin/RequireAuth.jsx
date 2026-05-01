@@ -3,5 +3,5 @@ import { useAuth } from '../../hooks/useAuth'
 
 export default function RequireAuth({ children }) {
   const { isAuthenticated } = useAuth()
-  return isAuthenticated ? children : <Navigate to="/admin/login" replace />
+  return isAuthenticated ? children : <Navigate to="/binn/login" replace />
 }

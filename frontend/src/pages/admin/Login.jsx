@@ -15,7 +15,7 @@ export default function Login() {
     setError('')
     try {
       await signIn(form)
-      navigate('/admin/dashboard')
+      navigate('/binn/dashboard')
     } catch {
       setError('Invalid credentials. Try again.')
     } finally {

@@ -17,21 +17,21 @@ import AdminChat from './pages/admin/Chat'
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<Portfolio />} />
-          <Route path="/admin/login" element={<Login />} />
-          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="/admin/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-          <Route path="/admin/projects" element={<RequireAuth><Projects /></RequireAuth>} />
-          <Route path="/admin/skills" element={<RequireAuth><Skills /></RequireAuth>} />
-          <Route path="/admin/experiences" element={<RequireAuth><Experiences /></RequireAuth>} />
-          <Route path="/admin/education" element={<RequireAuth><Education /></RequireAuth>} />
-          <Route path="/admin/certificates" element={<RequireAuth><Certificates /></RequireAuth>} />
-          <Route path="/admin/cv" element={<RequireAuth><CV /></RequireAuth>} />
-          <Route path="/admin/chat" element={<RequireAuth><AdminChat /></RequireAuth>} />
-          <Route path="/admin/messages" element={<RequireAuth><Messages /></RequireAuth>} />
-          <Route path="/admin/profile" element={<RequireAuth><AdminProfile /></RequireAuth>} />
+          <Route path="/binn/login" element={<Login />} />
+          <Route path="/binn" element={<Navigate to="/binn/dashboard" replace />} />
+          <Route path="/binn/dashboard"    element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/binn/profile"      element={<RequireAuth><AdminProfile /></RequireAuth>} />
+          <Route path="/binn/projects"     element={<RequireAuth><Projects /></RequireAuth>} />
+          <Route path="/binn/skills"       element={<RequireAuth><Skills /></RequireAuth>} />
+          <Route path="/binn/experiences"  element={<RequireAuth><Experiences /></RequireAuth>} />
+          <Route path="/binn/education"    element={<RequireAuth><Education /></RequireAuth>} />
+          <Route path="/binn/certificates" element={<RequireAuth><Certificates /></RequireAuth>} />
+          <Route path="/binn/cv"           element={<RequireAuth><CV /></RequireAuth>} />
+          <Route path="/binn/chat"         element={<RequireAuth><AdminChat /></RequireAuth>} />
+          <Route path="/binn/messages"     element={<RequireAuth><Messages /></RequireAuth>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

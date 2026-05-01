@@ -9,15 +9,15 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { to: '/admin/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/profile',     icon: User,            label: 'Profile' },
-  { to: '/admin/projects',    icon: FolderKanban,    label: 'Projects' },
-  { to: '/admin/skills',      icon: Wrench,          label: 'Skills' },
-  { to: '/admin/experiences', icon: Briefcase,       label: 'Experiences' },
-  { to: '/admin/education',   icon: GraduationCap,   label: 'Education' },
-  { to: '/admin/certificates',icon: Award,           label: 'Certificates' },
-  { to: '/admin/cv',          icon: FileText,        label: 'CV' },
-  { to: '/admin/messages',    icon: MessageSquare,   label: 'Messages' },
+  { to: '/binn/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/binn/profile',     icon: User,            label: 'Profile' },
+  { to: '/binn/projects',    icon: FolderKanban,    label: 'Projects' },
+  { to: '/binn/skills',      icon: Wrench,          label: 'Skills' },
+  { to: '/binn/experiences', icon: Briefcase,       label: 'Experiences' },
+  { to: '/binn/education',   icon: GraduationCap,   label: 'Education' },
+  { to: '/binn/certificates',icon: Award,           label: 'Certificates' },
+  { to: '/binn/cv',          icon: FileText,        label: 'CV' },
+  { to: '/binn/messages',    icon: MessageSquare,   label: 'Messages' },
 ]
 
 export default function AdminLayout({ children }) {
@@ -27,7 +27,7 @@ export default function AdminLayout({ children }) {
 
   const handleLogout = async () => {
     await signOut()
-    navigate('/admin/login')
+    navigate('/binn/login')
   }
 
   return (
