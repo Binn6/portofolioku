@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail } from 'lucide-react'
+import { Code2, Briefcase, Mail } from 'lucide-react'
 import Container from './Container'
 
 export default function Footer({ profile }) {
@@ -11,12 +11,12 @@ export default function Footer({ profile }) {
         <div className="flex items-center gap-4">
           {profile?.github && (
             <a href={profile.github} target="_blank" rel="noreferrer" className="text-accent-muted hover:text-accent transition-colors">
-              <Github size={18} />
+              <Code2 size={18} />
             </a>
           )}
           {profile?.linkedin && (
             <a href={profile.linkedin} target="_blank" rel="noreferrer" className="text-accent-muted hover:text-accent transition-colors">
-              <Linkedin size={18} />
+              <Briefcase size={18} />
             </a>
           )}
           {profile?.email && (
