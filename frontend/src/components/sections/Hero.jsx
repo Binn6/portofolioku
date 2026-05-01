@@ -26,7 +26,7 @@ export default function Hero({ profile }) {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+    <section className="relative min-h-screen flex items-center overflow-hidden">
       <AuroraCanvas colors={FIRE_COLORS} columnCount={22} />
       <div
         className="absolute inset-0 z-[1]"

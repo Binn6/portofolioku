@@ -4,22 +4,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import {
   LayoutDashboard, FolderKanban, Wrench, Briefcase,
-  GraduationCap, Award, FileText, MessageSquare,
-  MessageCircle, User,
+  GraduationCap, Award, FileText, MessageSquare, User,
   LogOut, Menu, X,
 } from 'lucide-react'
 
 const navItems = [
-  { to: '/admin/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/profile',    icon: User,             label: 'Profile' },
-  { to: '/admin/projects',   icon: FolderKanban,     label: 'Projects' },
-  { to: '/admin/skills',     icon: Wrench,           label: 'Skills' },
-  { to: '/admin/experiences',icon: Briefcase,        label: 'Experiences' },
-  { to: '/admin/education',  icon: GraduationCap,    label: 'Education' },
+  { to: '/admin/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/profile',     icon: User,            label: 'Profile' },
+  { to: '/admin/projects',    icon: FolderKanban,    label: 'Projects' },
+  { to: '/admin/skills',      icon: Wrench,          label: 'Skills' },
+  { to: '/admin/experiences', icon: Briefcase,       label: 'Experiences' },
+  { to: '/admin/education',   icon: GraduationCap,   label: 'Education' },
   { to: '/admin/certificates',icon: Award,           label: 'Certificates' },
-  { to: '/admin/cv',         icon: FileText,         label: 'CV' },
-  { to: '/admin/chat',       icon: MessageCircle,    label: 'Chat' },
-  { to: '/admin/messages',   icon: MessageSquare,    label: 'Messages' },
+  { to: '/admin/cv',          icon: FileText,        label: 'CV' },
+  { to: '/admin/messages',    icon: MessageSquare,   label: 'Messages' },
 ]
 
 export default function AdminLayout({ children }) {

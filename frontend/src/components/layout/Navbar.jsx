@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
-import Container from './Container'
 
 const links = [
-  { href: '#about', label: 'About' },
-  { href: '#skills', label: 'Skills' },
-  { href: '#projects', label: 'Projects' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#education', label: 'Education' },
+  { href: '#about',        label: 'About' },
+  { href: '#skills',       label: 'Skills' },
+  { href: '#projects',     label: 'Projects' },
+  { href: '#experience',   label: 'Experience' },
+  { href: '#education',    label: 'Education' },
   { href: '#certificates', label: 'Certificates' },
-  { href: '#contact', label: 'Contact' },
+  { href: '#contact',      label: 'Contact' },
 ]
 
 export default function Navbar() {
@@ -18,63 +17,93 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40)
+    const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-background/80 backdrop-blur border-b border-border' : ''
-      }`}
-    >
-      <Container className="flex items-center justify-between h-16">
-        <a href="#" className="font-display text-xl font-semibold text-accent">
-          Mochsabil
-        </a>
-        <nav className="hidden md:flex items-center gap-8">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="text-sm text-accent-muted hover:text-accent transition-colors"
-            >
-              {l.label}
-            </a>
-          ))}
-        </nav>
+    <>
+      {/* Desktop floating pill */}
+      <motion.div
+        initial={{ y: -24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.5, ease: 'easeOut' }}
+        className="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden md:block"
+      >
+        <div
+          className={`flex items-center gap-1 pl-5 pr-2 py-2 rounded-full border transition-all duration-300 ${
+            scrolled
+              ? 'bg-background/85 backdrop-blur-md border-border shadow-2xl shadow-black/30'
+              : 'bg-background/30 backdrop-blur-sm border-white/10'
+          }`}
+        >
+          <a
+            href="#"
+            className="font-display text-sm font-bold text-accent mr-4 shrink-0"
+          >
+            MA
+          </a>
+          <nav className="flex items-center">
+            {links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="text-xs text-accent-muted hover:text-accent transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2"
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </motion.div>
+
+      {/* Mobile: floating hamburger button */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.4 }}
+        className="fixed top-5 right-5 z-50 md:hidden"
+      >
         <button
-          className="md:hidden text-accent-muted hover:text-accent"
           onClick={() => setOpen(!open)}
+          className="w-10 h-10 rounded-full bg-surface/80 backdrop-blur-md border border-border flex items-center justify-center text-accent-muted hover:text-accent shadow-lg"
           aria-label="Toggle menu"
         >
-          {open ? <X size={20} /> : <Menu size={20} />}
+          <AnimatePresence mode="wait">
+            {open
+              ? <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}><X size={16} /></motion.span>
+              : <motion.span key="m" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}><Menu size={16} /></motion.span>
+            }
+          </AnimatePresence>
         </button>
-      </Container>
+      </motion.div>
+
+      {/* Mobile dropdown */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-surface border-b border-border"
+            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+            className="fixed top-16 right-5 z-50 md:hidden bg-surface/95 backdrop-blur-md border border-border rounded-2xl shadow-2xl overflow-hidden min-w-[160px]"
           >
-            <Container className="py-4 flex flex-col gap-4">
+            <nav className="flex flex-col py-2">
               {links.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
-                  className="text-sm text-accent-muted hover:text-accent transition-colors"
                   onClick={() => setOpen(false)}
+                  className="px-5 py-3 text-sm text-accent-muted hover:text-accent hover:bg-surface-2 transition-colors"
                 >
                   {l.label}
                 </a>
               ))}
-            </Container>
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   )
 }

@@ -37,7 +37,12 @@ export default function AdminProfile() {
     setSaving(true)
     setError(null)
     try {
-      await adminUpdateProfile(form)
+      const payload = { ...form }
+      // Laravel's nullable|url validation rejects empty strings — send null instead
+      ;['github', 'linkedin', 'instagram'].forEach((k) => {
+        if (payload[k] === '') payload[k] = null
+      })
+      await adminUpdateProfile(payload)
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
     } catch {
