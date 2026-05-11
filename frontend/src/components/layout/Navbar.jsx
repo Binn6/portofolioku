@@ -3,14 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
 const links = [
-  { href: '#about',        label: 'About' },
-  { href: '#skills',       label: 'Skills' },
-  { href: '#projects',     label: 'Projects' },
-  { href: '#experience',   label: 'Experience' },
-  { href: '#education',    label: 'Education' },
-  { href: '#certificates', label: 'Certificates' },
-  { href: '#contact',      label: 'Contact' },
+  { id: 'about',        label: 'About' },
+  { id: 'skills',       label: 'Skills' },
+  { id: 'projects',     label: 'Projects' },
+  { id: 'experience',   label: 'Experience' },
+  { id: 'education',    label: 'Education' },
+  { id: 'certificates', label: 'Certificates' },
+  { id: 'contact',      label: 'Contact' },
 ]
+
+const scrollTo = (id) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -42,21 +46,21 @@ export default function Navbar() {
               : 'bg-background/30 backdrop-blur-sm border-white/10'
           }`}
         >
-          <a
-            href="#"
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="font-display text-sm font-bold text-accent mr-4 shrink-0"
           >
             MA
-          </a>
+          </button>
           <nav className="flex items-center">
             {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
+              <button
+                key={l.id}
+                onClick={() => scrollTo(l.id)}
                 className="text-xs text-accent-muted hover:text-accent transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2"
               >
                 {l.label}
-              </a>
+              </button>
             ))}
           </nav>
         </div>
@@ -95,14 +99,13 @@ export default function Navbar() {
           >
             <nav className="flex flex-col py-2">
               {links.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="px-5 py-3 text-sm text-accent-muted hover:text-accent hover:bg-surface-2 transition-colors"
+                <button
+                  key={l.id}
+                  onClick={() => { scrollTo(l.id); setOpen(false) }}
+                  className="px-5 py-3 text-sm text-accent-muted hover:text-accent hover:bg-surface-2 transition-colors text-left w-full"
                 >
                   {l.label}
-                </a>
+                </button>
               ))}
             </nav>
           </motion.div>
