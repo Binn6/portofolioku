@@ -44,9 +44,9 @@ class AdminProfileController extends Controller
             'location'  => 'sometimes|nullable|string|max:100',
             'email'     => 'sometimes|nullable|email',
             'phone'     => 'sometimes|nullable|string|max:20',
-            'github'    => 'sometimes|nullable|url|max:255',
-            'linkedin'  => 'sometimes|nullable|url|max:255',
-            'instagram' => 'sometimes|nullable|url|max:255',
+            'github'    => 'sometimes|nullable|string|max:255',
+            'linkedin'  => 'sometimes|nullable|string|max:255',
+            'instagram' => 'sometimes|nullable|string|max:255',
         ])->validate();
 
         $profile = Profile::first();

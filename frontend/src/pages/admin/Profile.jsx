@@ -72,8 +72,12 @@ export default function AdminProfile() {
       await adminUpdateProfile(payload)
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
-    } catch {
-      setError('Failed to save. Please try again.')
+    } catch (err) {
+      const errors = err?.response?.data?.errors
+      const msg = errors
+        ? Object.values(errors).flat().join(' ')
+        : (err?.response?.data?.message || 'Failed to save. Please try again.')
+      setError(msg)
     } finally {
       setSaving(false)
     }
