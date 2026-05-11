@@ -4,6 +4,7 @@ import AnimatedSection from '../animations/AnimatedSection'
 import SectionWrapper from '../layout/SectionWrapper'
 import Container from '../layout/Container'
 import SectionTitle from '../ui/SectionTitle'
+import { useTilt } from '../ui/Tilt3D'
 
 function IconGithub() {
   return (
@@ -29,10 +30,12 @@ function IconInstagram() {
   )
 }
 
+const ensureUrl = (url) => url && (/^https?:\/\//.test(url) ? url : `https://${url}`)
+
 const socialLinks = (profile) => [
-  { icon: IconGithub,    href: profile?.github,    label: 'GitHub',    show: !!profile?.github },
-  { icon: IconLinkedin,  href: profile?.linkedin,   label: 'LinkedIn',  show: !!profile?.linkedin },
-  { icon: IconInstagram, href: profile?.instagram,  label: 'Instagram', show: !!profile?.instagram },
+  { icon: IconGithub,    href: ensureUrl(profile?.github),    label: 'GitHub',    show: !!profile?.github },
+  { icon: IconLinkedin,  href: ensureUrl(profile?.linkedin),  label: 'LinkedIn',  show: !!profile?.linkedin },
+  { icon: IconInstagram, href: ensureUrl(profile?.instagram), label: 'Instagram', show: !!profile?.instagram },
 ]
 
 export default function About({ profile }) {
@@ -45,6 +48,7 @@ export default function About({ profile }) {
           <SectionTitle subtitle="A bit about me">About</SectionTitle>
         </AnimatedSection>
         <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="order-2 md:order-1">
           <AnimatedSection>
             <p className="text-accent-muted leading-relaxed text-lg mb-6">
               {profile?.bio}
@@ -70,65 +74,104 @@ export default function About({ profile }) {
               )}
             </div>
           </AnimatedSection>
+          </div>
 
+          <div className="order-1 md:order-2">
           <AnimatedSection>
             <ProfileCard profile={profile} links={links} />
           </AnimatedSection>
+          </div>
         </div>
       </Container>
     </SectionWrapper>
   )
 }
 
-function ProfileCard({ profile, links }) {
+function OrbitalRing({ rotateX, duration, radius = '115%' }) {
   return (
     <motion.div
-      whileHover={{ y: -6, rotateX: 2, rotateY: -2 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      style={{ transformStyle: 'preserve-3d' }}
-      className="glass rounded-2xl overflow-hidden max-w-sm mx-auto"
-    >
-      {/* Photo */}
-      <div className="relative aspect-square bg-surface-2">
-        <img
-          src="/profile.jpg"
-          alt={profile?.name || 'Profile'}
-          className="w-full h-full object-cover"
-          onError={(e) => { e.target.style.display = 'none' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
-      </div>
+      className="absolute rounded-full border border-accent/[0.07] pointer-events-none"
+      style={{
+        width: radius, height: radius,
+        top: '50%', left: '50%',
+        marginTop: `-${parseFloat(radius) / 2}%`,
+        marginLeft: `-${parseFloat(radius) / 2}%`,
+        rotateX,
+        transformStyle: 'preserve-3d',
+      }}
+      animate={{ rotateZ: 360 }}
+      transition={{ duration, repeat: Infinity, ease: 'linear' }}
+    />
+  )
+}
 
-      {/* Info */}
-      <div className="px-6 py-5">
-        <h3 className="font-display text-xl font-bold text-accent mb-1">
-          {profile?.name || 'Mochsabil Em Abyan'}
-        </h3>
-        <p className="text-accent-muted text-sm mb-5">
-          {profile?.title || 'Data Analyst & Web Developer'}
-        </p>
+function ProfileCard({ profile, links }) {
+  const isTouch = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
+  const { ref, rotateX, rotateY, glareBg, onMouseMove, onMouseLeave } = useTilt(10)
 
-        {/* Social links */}
-        {links.length > 0 && (
-          <div className="flex gap-3">
-            {links.map(({ icon: Icon, href, label }) => (
-              <motion.a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={label}
-                whileHover={{ scale: 1.15, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="flex items-center justify-center w-9 h-9 rounded-lg bg-surface-2 text-accent-muted hover:text-accent hover:bg-accent-dim transition-colors"
-              >
-                <Icon />
-              </motion.a>
-            ))}
-          </div>
+  return (
+    <div className="relative flex items-center justify-center overflow-hidden rounded-3xl py-10" style={{ perspective: 900 }}>
+      <OrbitalRing rotateX="70deg" duration={14} radius="130%" />
+      <OrbitalRing rotateX="50deg" duration={20} radius="148%" />
+      <OrbitalRing rotateX="80deg" duration={9}  radius="116%" />
+
+      <motion.div
+        ref={ref}
+        onMouseMove={isTouch ? undefined : onMouseMove}
+        onMouseLeave={isTouch ? undefined : onMouseLeave}
+        style={isTouch ? {} : { rotateX, rotateY, transformStyle: 'preserve-3d' }}
+        className="glass rounded-2xl overflow-hidden max-w-sm w-full relative"
+      >
+        <div className="relative aspect-square bg-surface-2">
+          {profile?.photo_url ? (
+            <img
+              src={profile.photo_url}
+              alt={profile?.name || 'Profile'}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-accent-muted text-6xl font-display font-bold select-none">
+              {profile?.name?.charAt(0) || 'M'}
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
+        </div>
+
+        <div className="px-6 py-5">
+          <h3 className="font-display text-xl font-bold text-accent mb-1">
+            {profile?.name || 'Mochsabil Em Abyan'}
+          </h3>
+          <p className="text-accent-muted text-sm mb-5">
+            {profile?.title || 'Data Analyst & Web Developer'}
+          </p>
+          {links.length > 0 && (
+            <div className="flex gap-3">
+              {links.map(({ icon: Icon, href, label }) => (
+                <motion.a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  whileHover={{ scale: 1.15, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-surface-2 text-accent-muted hover:text-accent hover:bg-accent-dim transition-colors"
+                >
+                  <Icon />
+                </motion.a>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {!isTouch && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none rounded-[inherit] z-10"
+            style={{ background: glareBg }}
+          />
         )}
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   )
 }

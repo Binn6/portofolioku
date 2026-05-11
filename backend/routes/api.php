@@ -26,9 +26,9 @@ Route::get('/projects', [ProjectController::class, 'index']);
 Route::get('/experiences', [ExperienceController::class, 'index']);
 Route::get('/education', [EducationController::class, 'index']);
 Route::get('/certificates', [CertificateController::class, 'index']);
-Route::post('/contact', [ContactController::class, 'store']);
-Route::post('/chat', [ChatController::class, 'send']);
-Route::get('/chat/{sessionId}', [ChatController::class, 'messages']);
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:10,1');
+Route::post('/chat', [ChatController::class, 'send'])->middleware('throttle:30,1');
+Route::get('/chat/{sessionId}', [ChatController::class, 'messages'])->middleware('throttle:60,1');
 
 // Auth
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
     Route::get('/profile', [AdminProfileController::class, 'show']);
     Route::put('/profile', [AdminProfileController::class, 'update']);
+    Route::post('/profile/photo', [AdminProfileController::class, 'updatePhoto']);
     Route::post('/cv', [AdminCvController::class, 'update']);
 
     Route::get('/skills', [AdminSkillController::class, 'index']);
@@ -51,7 +52,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
     Route::get('/projects', [AdminProjectController::class, 'index']);
     Route::post('/projects', [AdminProjectController::class, 'store']);
-    Route::put('/projects/{id}', [AdminProjectController::class, 'update']);
+    Route::match(['PUT', 'POST'], '/projects/{id}', [AdminProjectController::class, 'update']);
     Route::delete('/projects/{id}', [AdminProjectController::class, 'destroy']);
 
     Route::get('/experiences', [AdminExperienceController::class, 'index']);
@@ -71,6 +72,6 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
     Route::get('/certificates', [AdminCertificateController::class, 'index']);
     Route::post('/certificates', [AdminCertificateController::class, 'store']);
-    Route::put('/certificates/{id}', [AdminCertificateController::class, 'update']);
+    Route::match(['PUT', 'POST'], '/certificates/{id}', [AdminCertificateController::class, 'update']);
     Route::delete('/certificates/{id}', [AdminCertificateController::class, 'destroy']);
 });

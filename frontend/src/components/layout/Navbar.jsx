@@ -17,7 +17,10 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 60)
+      setOpen(false)
+    }
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -68,7 +71,7 @@ export default function Navbar() {
       >
         <button
           onClick={() => setOpen(!open)}
-          className="w-10 h-10 rounded-full bg-surface/80 backdrop-blur-md border border-border flex items-center justify-center text-accent-muted hover:text-accent shadow-lg"
+          className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-accent-muted hover:text-accent shadow-lg"
           aria-label="Toggle menu"
         >
           <AnimatePresence mode="wait">

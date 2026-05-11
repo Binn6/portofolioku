@@ -5,6 +5,9 @@
 @tailwind utilities;
 
 @layer base {
+  html, body {
+    overflow-x: hidden;
+  }
   body {
     @apply bg-background text-accent font-sans antialiased;
   }
@@ -17,4 +20,10 @@
   .glass {
     @apply bg-surface/60 backdrop-blur-md border border-border;
   }
+}
+
+/* Allow text selection inside inputs even when parent has select-none */
+input, textarea, select {
+  -webkit-user-select: text;
+  user-select: text;
 }

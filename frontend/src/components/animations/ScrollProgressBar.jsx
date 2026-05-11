@@ -22,7 +22,7 @@ export default function ScrollProgressBar() {
   }, [])
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-0.5 z-50 bg-surface-2">
+    <div className="fixed top-0 left-0 right-0 h-0.5 z-50">
       <div ref={barRef} className="h-full bg-accent w-0" />
     </div>
   )

@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import {
   LayoutDashboard, FolderKanban, Wrench, Briefcase,
   GraduationCap, Award, FileText, MessageSquare, User,
-  LogOut, Menu, X,
+  LogOut, Menu, X, Grid2x2,
 } from 'lucide-react'
 
 const navItems = [
@@ -36,7 +36,7 @@ export default function AdminLayout({ children }) {
         <motion.aside
           initial={false}
           animate={{ width: open ? 240 : 64 }}
-          className="h-full bg-surface border-r border-border flex flex-col shrink-0 overflow-hidden"
+          className="hidden md:flex h-full bg-surface border-r border-border flex-col shrink-0 overflow-hidden"
         >
           <div className="flex items-center justify-between p-4 border-b border-border">
             {open && (
@@ -81,7 +81,31 @@ export default function AdminLayout({ children }) {
           </div>
         </motion.aside>
       </AnimatePresence>
-      <main className="flex-1 overflow-y-auto p-8">{children}</main>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8">{children}</main>
+
+      {/* Bottom nav — mobile only */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden bg-surface border-t border-border h-16">
+        {[
+          { to: '/binn/dashboard', icon: LayoutDashboard, label: 'Home' },
+          { to: '/binn/projects',  icon: FolderKanban,    label: 'Projects' },
+          { to: '/binn/profile',   icon: User,            label: 'Profile' },
+          { to: '/binn/messages',  icon: MessageSquare,   label: 'Messages' },
+          { to: '/binn/more',      icon: Grid2x2,         label: 'More' },
+        ].map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `flex-1 flex flex-col items-center justify-center gap-1 transition-colors ${
+                isActive ? 'text-accent' : 'text-accent-muted'
+              }`
+            }
+          >
+            <Icon size={20} />
+            <span className="text-[10px]">{label}</span>
+          </NavLink>
+        ))}
+      </nav>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getProfile, getSkills, getProjects, getExperiences, getEducation, getCertificates } from '../services/api'
 import SplashScreen from '../components/animations/SplashScreen'
 import ScrollProgressBar from '../components/animations/ScrollProgressBar'
@@ -19,6 +19,30 @@ export default function Portfolio() {
   const [ready, setReady] = useState(false)
   const [splashDone, setSplashDone] = useState(false)
   const [showSplash, setShowSplash] = useState(false)
+  const [copyAlert, setCopyAlert] = useState(false)
+  const alertTimer = useRef(null)
+
+  useEffect(() => {
+    const showAlert = () => {
+      clearTimeout(alertTimer.current)
+      setCopyAlert(true)
+      alertTimer.current = setTimeout(() => setCopyAlert(false), 2000)
+    }
+
+    const prevent = (e) => { e.preventDefault(); showAlert() }
+    const preventContext = (e) => { e.preventDefault() }
+
+    document.addEventListener('copy', prevent)
+    document.addEventListener('cut', prevent)
+    document.addEventListener('contextmenu', preventContext)
+
+    return () => {
+      document.removeEventListener('copy', prevent)
+      document.removeEventListener('cut', prevent)
+      document.removeEventListener('contextmenu', preventContext)
+      clearTimeout(alertTimer.current)
+    }
+  }, [])
 
   useEffect(() => {
     const startTime = Date.now()
@@ -57,7 +81,7 @@ export default function Portfolio() {
   }
 
   return (
-    <>
+    <div className="select-none">
       <ScrollProgressBar />
       <Navbar />
       <main>
@@ -72,6 +96,15 @@ export default function Portfolio() {
         <Contact profile={data.profile} />
       </main>
       <Footer profile={data.profile} />
-    </>
+
+      {/* Copy prevention toast */}
+      <div
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] px-5 py-3 rounded-xl bg-surface border border-border text-sm text-accent-muted shadow-2xl transition-all duration-300 pointer-events-none whitespace-nowrap ${
+          copyAlert ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+        }`}
+      >
+        Konten ini dilindungi — tidak dapat disalin
+      </div>
+    </div>
   )
 }

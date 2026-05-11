@@ -13,6 +13,7 @@ import CV from './pages/admin/CV'
 import Messages from './pages/admin/Messages'
 import AdminProfile from './pages/admin/Profile'
 import AdminChat from './pages/admin/Chat'
+import More from './pages/admin/More'
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/binn/cv"           element={<RequireAuth><CV /></RequireAuth>} />
           <Route path="/binn/chat"         element={<RequireAuth><AdminChat /></RequireAuth>} />
           <Route path="/binn/messages"     element={<RequireAuth><Messages /></RequireAuth>} />
+          <Route path="/binn/more"         element={<RequireAuth><More /></RequireAuth>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

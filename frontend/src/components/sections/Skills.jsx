@@ -1,20 +1,22 @@
 import { motion } from 'framer-motion'
-import { staggerContainer, fadeUp } from '../../animations/variants'
+import { staggerContainer, flipIn3D } from '../../animations/variants'
 import AnimatedSection from '../animations/AnimatedSection'
 import SectionWrapper from '../layout/SectionWrapper'
 import Container from '../layout/Container'
 import SectionTitle from '../ui/SectionTitle'
+import { useTilt } from '../ui/Tilt3D'
 
 const CATEGORIES = ['Languages', 'Frameworks', 'Data', 'Tools', 'Soft Skills']
-
-const levelLabel = (level) => ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert'][level]
+const LEVEL_LABEL = ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert']
 
 export default function Skills({ skills }) {
   const grouped = CATEGORIES.reduce((acc, cat) => {
-    const filtered = (skills || []).filter((s) => s.category === cat)
-    if (filtered.length) acc[cat] = filtered
+    const items = (skills || []).filter((s) => s.category === cat)
+    if (items.length) acc[cat] = items
     return acc
   }, {})
+
+  if (!Object.keys(grouped).length) return null
 
   return (
     <SectionWrapper id="skills" className="bg-surface/30">
@@ -22,40 +24,73 @@ export default function Skills({ skills }) {
         <AnimatedSection>
           <SectionTitle subtitle="Technologies and tools I work with">Skills</SectionTitle>
         </AnimatedSection>
-        <div className="space-y-10">
+
+        <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
           {Object.entries(grouped).map(([cat, items]) => (
-            <div key={cat}>
-              <h3 className="text-sm font-medium text-accent-muted uppercase tracking-widest mb-4">{cat}</h3>
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="flex flex-wrap gap-3"
-              >
-                {items.map((skill) => (
-                  <motion.div
-                    key={skill._id}
-                    variants={fadeUp}
-                    className="glass rounded-lg px-4 py-2.5 flex items-center gap-3"
-                  >
-                    <span className="text-sm text-accent">{skill.name}</span>
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`w-1.5 h-1.5 rounded-full ${i < skill.level ? 'bg-accent' : 'bg-accent-dim'}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-accent-muted">{levelLabel(skill.level)}</span>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
+            <CategoryBlock key={cat} cat={cat} items={items} />
           ))}
         </div>
       </Container>
     </SectionWrapper>
+  )
+}
+
+function CategoryBlock({ cat, items }) {
+  const { ref, rotateX, rotateY, glareBg, onMouseMove, onMouseLeave } = useTilt(4)
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 800 }}
+      className="relative bg-surface-2/40 border border-border rounded-2xl p-5"
+    >
+      <div className="flex items-center gap-3 mb-5">
+        <h3 className="text-xs font-semibold text-accent uppercase tracking-widest">{cat}</h3>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="grid grid-cols-2 sm:grid-cols-1 gap-2"
+        style={{ perspective: '600px' }}
+      >
+        {items.map((skill) => (
+          <motion.div
+            key={skill.id ?? skill._id}
+            variants={flipIn3D}
+            className="flex flex-col sm:flex-row items-center sm:items-center gap-1.5 sm:gap-4 bg-surface-2 border border-border hover:border-accent-dim rounded-xl px-3 sm:px-5 py-3 transition-colors text-center sm:text-left"
+          >
+            <span className="text-xs sm:text-sm text-accent sm:flex-1 sm:min-w-0 sm:truncate">{skill.name}</span>
+            <div className="flex gap-0.5 sm:hidden">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < skill.level ? 'bg-accent' : 'bg-border'}`} />
+              ))}
+            </div>
+            <span className="text-xs text-accent-muted shrink-0 w-20 text-right hidden sm:block">
+              {LEVEL_LABEL[skill.level]}
+            </span>
+            <div className="w-24 h-1.5 rounded-full bg-surface shrink-0 overflow-hidden hidden sm:block">
+              <motion.div
+                className="h-full rounded-full bg-accent"
+                initial={{ width: 0 }}
+                whileInView={{ width: `${(skill.level / 5) * 100}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
+              />
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <motion.div
+        className="absolute inset-0 pointer-events-none rounded-2xl z-10"
+        style={{ background: glareBg }}
+      />
+    </motion.div>
   )
 }

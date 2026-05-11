@@ -10,9 +10,9 @@ class ChatController extends Controller
     public function send(Request $request)
     {
         $data = $request->validate([
-            'session_id' => 'required|string|max:100',
+            'session_id' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z0-9\-_]+$/'],
             'name'       => 'required|string|max:100',
-            'email'      => 'required|email',
+            'email'      => 'required|email|max:254',
             'message'    => 'required|string|max:2000',
         ]);
 

@@ -3,6 +3,7 @@ import axios from 'axios'
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL + '/api',
   headers: { 'Content-Type': 'application/json' },
+  timeout: 8000,
 })
 
 api.interceptors.request.use((config) => {
@@ -27,10 +28,12 @@ export const logout = () => api.post('/admin/auth/logout')
 // Admin — profile
 export const adminGetProfile = () => api.get('/admin/profile')
 export const adminUpdateProfile = (data) => api.put('/admin/profile', data)
+export const adminUploadProfilePhoto = (formData) =>
+  api.post('/admin/profile/photo', formData, { headers: { 'Content-Type': undefined } })
 export const adminUploadCv = (file) => {
   const form = new FormData()
   form.append('cv', file)
-  return api.post('/admin/cv', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  return api.post('/admin/cv', form, { headers: { 'Content-Type': undefined } })
 }
 
 // Admin — skills
@@ -42,9 +45,9 @@ export const adminDeleteSkill = (id) => api.delete(`/admin/skills/${id}`)
 // Admin — projects
 export const adminGetProjects = () => api.get('/admin/projects')
 export const adminCreateProject = (form) =>
-  api.post('/admin/projects', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  api.post('/admin/projects', form, { headers: { 'Content-Type': undefined } })
 export const adminUpdateProject = (id, form) =>
-  api.put(`/admin/projects/${id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  api.post(`/admin/projects/${id}`, form, { headers: { 'Content-Type': undefined } })
 export const adminDeleteProject = (id) => api.delete(`/admin/projects/${id}`)
 
 // Admin — experiences
@@ -62,9 +65,9 @@ export const adminDeleteEducation = (id) => api.delete(`/admin/education/${id}`)
 // Admin — certificates
 export const adminGetCertificates = () => api.get('/admin/certificates')
 export const adminCreateCertificate = (form) =>
-  api.post('/admin/certificates', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  api.post('/admin/certificates', form, { headers: { 'Content-Type': undefined } })
 export const adminUpdateCertificate = (id, form) =>
-  api.put(`/admin/certificates/${id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  api.post(`/admin/certificates/${id}`, form, { headers: { 'Content-Type': undefined } })
 export const adminDeleteCertificate = (id) => api.delete(`/admin/certificates/${id}`)
 
 // Admin — messages
