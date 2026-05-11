@@ -3,11 +3,13 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AdminProjectController extends Controller
 {
+    public function __construct(private CloudinaryService $cloudinary) {}
+
     public function index()
     {
         return response()->json(Project::all()->map(fn($p) => $this->withUrl($p)));
@@ -16,17 +18,20 @@ class AdminProjectController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:200',
+            'title'       => 'required|string|max:200',
             'description' => 'required|string',
-            'tech_stack' => 'required|array',
-            'thumbnail' => 'nullable|file|mimes:jpeg,png,webp|max:2048',
-            'github_url' => 'nullable|url',
-            'live_url' => 'nullable|url',
+            'tech_stack'  => 'required|array',
+            'thumbnail'   => 'nullable|file|mimes:jpeg,png,webp|max:2048',
+            'github_url'  => 'nullable|url',
+            'live_url'    => 'nullable|url',
             'is_featured' => 'boolean',
+            'type'        => 'nullable|string|max:50',
         ]);
 
         if ($request->hasFile('thumbnail')) {
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('projects', 'public');
+            $uploaded = $this->cloudinary->upload($request->file('thumbnail'), 'portfolio/projects');
+            $data['thumbnail_path']      = $uploaded['url'];
+            $data['thumbnail_public_id'] = $uploaded['public_id'];
         }
         unset($data['thumbnail']);
 
@@ -37,20 +42,23 @@ class AdminProjectController extends Controller
     {
         $project = Project::findOrFail($id);
         $data = $request->validate([
-            'title' => 'sometimes|string|max:200',
+            'title'       => 'sometimes|string|max:200',
             'description' => 'sometimes|string',
-            'tech_stack' => 'sometimes|array',
-            'thumbnail' => 'nullable|file|mimes:jpeg,png,webp|max:2048',
-            'github_url' => 'nullable|url',
-            'live_url' => 'nullable|url',
+            'tech_stack'  => 'sometimes|array',
+            'thumbnail'   => 'nullable|file|mimes:jpeg,png,webp|max:2048',
+            'github_url'  => 'nullable|url',
+            'live_url'    => 'nullable|url',
             'is_featured' => 'boolean',
+            'type'        => 'nullable|string|max:50',
         ]);
 
         if ($request->hasFile('thumbnail')) {
-            if ($project->thumbnail_path) {
-                Storage::disk('public')->delete($project->thumbnail_path);
+            if ($project->thumbnail_public_id) {
+                $this->cloudinary->delete($project->thumbnail_public_id);
             }
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('projects', 'public');
+            $uploaded = $this->cloudinary->upload($request->file('thumbnail'), 'portfolio/projects');
+            $data['thumbnail_path']      = $uploaded['url'];
+            $data['thumbnail_public_id'] = $uploaded['public_id'];
         }
         unset($data['thumbnail']);
 
@@ -61,8 +69,8 @@ class AdminProjectController extends Controller
     public function destroy($id)
     {
         $project = Project::findOrFail($id);
-        if ($project->thumbnail_path) {
-            Storage::disk('public')->delete($project->thumbnail_path);
+        if ($project->thumbnail_public_id) {
+            $this->cloudinary->delete($project->thumbnail_public_id);
         }
         $project->delete();
         return response()->json(null, 204);
@@ -71,7 +79,7 @@ class AdminProjectController extends Controller
     private function withUrl($project)
     {
         if ($project->thumbnail_path) {
-            $project->thumbnail_url = url('storage/' . $project->thumbnail_path);
+            $project->thumbnail_url = $project->thumbnail_path;
         }
         return $project;
     }
