@@ -23,12 +23,14 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 COPY composer.json composer.lock ./
+ENV COMPOSER_MEMORY_LIMIT=-1
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 COPY . .
 
-RUN cp .env.example .env \
-    && php artisan key:generate \
+# Build-time bootstrap: use safe dummy values so artisan can boot without real DB/Cloudinary
+RUN printf 'APP_KEY=base64:%s\nAPP_ENV=production\nSESSION_DRIVER=array\nCACHE_STORE=array\nDB_CONNECTION=mongodb\nMONGODB_URI=mongodb://localhost/dummy\n' \
+        "$(openssl rand -base64 32)" > .env \
     && php artisan package:discover --ansi \
     && rm .env
 
