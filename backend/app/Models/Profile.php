@@ -10,6 +10,8 @@ class Profile extends Model
 
     protected $fillable = [
         'name', 'title', 'bio', 'location', 'email', 'phone',
-        'github', 'linkedin', 'instagram', 'cv_path',
+        'github', 'linkedin', 'instagram',
+        'cv_path', 'photo_path',
+        'photo_public_id', 'cv_public_id',
     ];
 }

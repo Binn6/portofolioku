@@ -8,5 +8,5 @@ class Certificate extends Model
     protected $connection = 'mongodb';
     protected $collection = 'certificates';
 
-    protected $fillable = ['title', 'issuer', 'date', 'category', 'file_path'];
+    protected $fillable = ['title', 'issuer', 'date', 'category', 'file_path', 'file_public_id'];
 }

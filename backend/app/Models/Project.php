@@ -10,7 +10,8 @@ class Project extends Model
 
     protected $fillable = [
         'title', 'description', 'tech_stack', 'thumbnail_path',
-        'github_url', 'live_url', 'is_featured',
+        'github_url', 'live_url', 'is_featured', 'type',
+        'thumbnail_public_id',
     ];
 
     protected $casts = [
