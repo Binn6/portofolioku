@@ -3,11 +3,13 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AdminCvController extends Controller
 {
+    public function __construct(private CloudinaryService $cloudinary) {}
+
     public function update(Request $request)
     {
         $request->validate([
@@ -15,14 +17,18 @@ class AdminCvController extends Controller
         ]);
 
         $profile = Profile::first();
-        if ($profile && $profile->cv_path) {
-            Storage::disk('public')->delete($profile->cv_path);
+
+        if ($profile && $profile->cv_public_id) {
+            $this->cloudinary->delete($profile->cv_public_id, 'raw');
         }
 
-        $path = $request->file('cv')->storeAs('cv', 'cv.pdf', 'public');
+        $uploaded = $this->cloudinary->upload($request->file('cv'), 'portfolio/cv', 'raw');
 
-        Profile::updateOrCreate([], ['cv_path' => $path]);
+        Profile::updateOrCreate([], [
+            'cv_path'      => $uploaded['url'],
+            'cv_public_id' => $uploaded['public_id'],
+        ]);
 
-        return response()->json(['cv_url' => url('storage/' . $path)]);
+        return response()->json(['cv_url' => $uploaded['url']]);
     }
 }
