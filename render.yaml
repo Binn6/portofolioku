@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: portfolio-backend
+    env: docker
+    branch: main
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /up

@@ -9,4 +9,3 @@ storage/framework/views/*
 *.log
 .git
 .gitignore
-docker/
