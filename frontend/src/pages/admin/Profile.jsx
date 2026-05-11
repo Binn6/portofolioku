@@ -61,14 +61,22 @@ export default function AdminProfile() {
     }
   }
 
+  const normalizeUrl = (val) => {
+    if (!val) return null
+    if (/^https?:\/\//i.test(val)) return val
+    return 'https://' + val
+  }
+
   const handleSave = async () => {
     setSaving(true)
     setError(null)
     try {
-      const keys = ['name', 'title', 'bio', 'location', 'email', 'phone', 'github', 'linkedin', 'instagram']
-      const payload = Object.fromEntries(
-        keys.map((k) => [k, form[k] === '' ? null : (form[k] ?? null)])
-      )
+      const textKeys = ['name', 'title', 'bio', 'location', 'email', 'phone']
+      const urlKeys = ['github', 'linkedin', 'instagram']
+      const payload = {
+        ...Object.fromEntries(textKeys.map((k) => [k, form[k] === '' ? null : (form[k] ?? null)])),
+        ...Object.fromEntries(urlKeys.map((k) => [k, normalizeUrl(form[k] || '')])),
+      }
       await adminUpdateProfile(payload)
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
