@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Send, Code2, Briefcase, Mail } from 'lucide-react'
+import { Send, Code2, Briefcase, Mail, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { postContact } from '../../services/api'
 import AnimatedSection from '../animations/AnimatedSection'
@@ -11,6 +11,12 @@ import WireframeCube from '../ui/WireframeCube'
 import Tilt3D from '../ui/Tilt3D'
 
 const ensureUrl = (url) => url && (/^https?:\/\//.test(url) ? url : `https://${url}`)
+const waUrl = (phone) => {
+  if (!phone) return null
+  const digits = phone.replace(/\D/g, '')
+  const intl = digits.startsWith('0') ? '62' + digits.slice(1) : digits
+  return `https://wa.me/${intl}`
+}
 
 export default function Contact({ profile }) {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
@@ -58,6 +64,11 @@ export default function Contact({ profile }) {
               {profile?.linkedin && (
                 <a href={ensureUrl(profile.linkedin)} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-accent-muted hover:text-accent transition-colors text-sm">
                   <Briefcase size={16} /> LinkedIn
+                </a>
+              )}
+              {profile?.phone && (
+                <a href={waUrl(profile.phone)} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-accent-muted hover:text-accent transition-colors text-sm">
+                  <MessageCircle size={16} /> WhatsApp
                 </a>
               )}
             </div>
