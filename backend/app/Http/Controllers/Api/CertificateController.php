@@ -10,7 +10,7 @@ class CertificateController extends Controller
     {
         $certs = Certificate::all()->map(function ($c) {
             if ($c->file_path) {
-                $c->file_url = url('storage/' . $c->file_path);
+                $c->file_url = $c->file_path;
             }
             return $c;
         });

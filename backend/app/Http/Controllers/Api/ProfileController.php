@@ -9,9 +9,19 @@ class ProfileController extends Controller
     public function show()
     {
         $profile = Profile::first();
-        if ($profile && $profile->cv_path) {
-            $profile->cv_url = url('storage/' . $profile->cv_path);
+        if (!$profile) {
+            return response()->json(null);
         }
+
+        if ($profile->cv_path) {
+            $profile->cv_url = $profile->cv_path;
+        }
+        if ($profile->photo_path) {
+            $profile->photo_url = $profile->photo_path;
+        }
+
+        $profile->makeHidden(['cv_path', 'photo_path', 'photo_public_id', 'cv_public_id']);
+
         return response()->json($profile);
     }
 }
