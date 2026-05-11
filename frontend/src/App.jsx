@@ -21,6 +21,7 @@ export default function App() {
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<Portfolio />} />
+          <Route path="/:section" element={<Portfolio />} />
           <Route path="/binn/login" element={<Login />} />
           <Route path="/binn" element={<Navigate to="/binn/dashboard" replace />} />
           <Route path="/binn/dashboard"    element={<RequireAuth><Dashboard /></RequireAuth>} />

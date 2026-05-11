@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import { getProfile, getSkills, getProjects, getExperiences, getEducation, getCertificates } from '../services/api'
 import SplashScreen from '../components/animations/SplashScreen'
 import ScrollProgressBar from '../components/animations/ScrollProgressBar'
@@ -15,6 +16,7 @@ import Certificates from '../components/sections/Certificates'
 import Contact from '../components/sections/Contact'
 
 export default function Portfolio() {
+  const { section } = useParams()
   const [data, setData] = useState({})
   const [ready, setReady] = useState(false)
   const [splashDone, setSplashDone] = useState(false)
@@ -68,6 +70,14 @@ export default function Portfolio() {
       setReady(true)
     }).catch(() => setReady(true))
   }, [])
+
+  useEffect(() => {
+    if (ready && section) {
+      setTimeout(() => {
+        document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    }
+  }, [ready, section])
 
   if (!ready || (showSplash && !splashDone)) {
     if (showSplash) {

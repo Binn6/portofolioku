@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
@@ -12,13 +13,16 @@ const links = [
   { id: 'contact',      label: 'Contact' },
 ]
 
-const scrollTo = (id) => {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-}
 
 export default function Navbar() {
+  const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+
+  const goTo = (id) => {
+    navigate('/' + id)
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   useEffect(() => {
     const onScroll = () => {
@@ -56,7 +60,7 @@ export default function Navbar() {
             {links.map((l) => (
               <button
                 key={l.id}
-                onClick={() => scrollTo(l.id)}
+                onClick={() => goTo(l.id)}
                 className="text-xs text-accent-muted hover:text-accent transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2"
               >
                 {l.label}
@@ -101,7 +105,7 @@ export default function Navbar() {
               {links.map((l) => (
                 <button
                   key={l.id}
-                  onClick={() => { scrollTo(l.id); setOpen(false) }}
+                  onClick={() => { goTo(l.id); setOpen(false) }}
                   className="px-5 py-3 text-sm text-accent-muted hover:text-accent hover:bg-surface-2 transition-colors text-left w-full"
                 >
                   {l.label}
