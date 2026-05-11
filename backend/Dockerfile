@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pecl install mongodb \
+RUN pecl install mongodb-1.21.5 \
     && docker-php-ext-enable mongodb \
     && docker-php-ext-install mbstring exif bcmath gd
 
