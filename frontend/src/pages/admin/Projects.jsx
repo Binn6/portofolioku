@@ -53,9 +53,10 @@ export default function Projects() {
       }
       setModal(null)
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.response?.data?.errors
-        ? Object.values(err.response.data.errors).flat().join(' ')
-        : 'Save failed. Please try again.'
+      const errors = err?.response?.data?.errors
+      const msg = errors
+        ? Object.values(errors).flat().join(' ')
+        : (err?.response?.data?.message || 'Save failed. Please try again.')
       setSaveError(msg)
     } finally { setSaving(false) }
   }

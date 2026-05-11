@@ -49,8 +49,12 @@ export default function AdminProfile() {
       fd.append('photo', file)
       const { data } = await adminUploadProfilePhoto(fd)
       setPhotoUrl(data.photo_url)
-    } catch {
-      setError('Failed to upload photo. Max 2MB, jpeg/png/webp only.')
+    } catch (err) {
+      const errors = err?.response?.data?.errors
+      const msg = errors
+        ? Object.values(errors).flat().join(' ')
+        : (err?.response?.data?.message || 'Upload failed. Check Cloudinary credentials on Render.')
+      setError(msg)
     } finally {
       setUploadingPhoto(false)
       e.target.value = ''
