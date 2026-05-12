@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import RequireAuth from './components/admin/RequireAuth'
 import Portfolio from './pages/Portfolio'
+import ThankYou from './pages/ThankYou'
 import Login from './pages/admin/Login'
 import Dashboard from './pages/admin/Dashboard'
 import Projects from './pages/admin/Projects'
@@ -21,6 +22,7 @@ export default function App() {
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<Portfolio />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/:section" element={<Portfolio />} />
           <Route path="/binn/login" element={<Login />} />
           <Route path="/binn" element={<Navigate to="/binn/dashboard" replace />} />

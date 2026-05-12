@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Send, Code2, Briefcase, Mail, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { postContact } from '../../services/api'
 import AnimatedSection from '../animations/AnimatedSection'
 import SectionWrapper from '../layout/SectionWrapper'
@@ -19,6 +20,7 @@ const waUrl = (phone) => {
 }
 
 export default function Contact({ profile }) {
+  const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -28,8 +30,7 @@ export default function Contact({ profile }) {
     setLoading(true)
     try {
       await postContact(form)
-      setStatus('success')
-      setForm({ name: '', email: '', message: '' })
+      navigate('/thank-you')
     } catch {
       setStatus('error')
     } finally {
@@ -116,9 +117,6 @@ export default function Contact({ profile }) {
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     required
                   />
-                  {status === 'success' && (
-                    <p className="text-sm text-green-400">Message sent! I'll get back to you soon.</p>
-                  )}
                   {status === 'error' && (
                     <p className="text-sm text-red-400">Something went wrong. Please try again.</p>
                   )}
