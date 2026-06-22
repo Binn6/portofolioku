@@ -87,40 +87,7 @@ export default function Projects({ projects }) {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {/* SQL Mission Control — featured interactive project */}
-          <div
-            className="relative group cursor-pointer border border-sql-primary/30 rounded-xl overflow-hidden
-              bg-surface hover:border-sql-primary hover:shadow-[0_0_20px_rgba(0,255,65,0.12)] transition-all duration-300"
-            onClick={() => navigate('/sql-mission-control')}
-          >
-            {/* Badge */}
-            <div className="absolute top-3 right-3 z-10">
-              <span className="text-xs font-mono px-2 py-0.5 bg-sql-primary text-background rounded font-bold">
-                Interactive
-              </span>
-            </div>
-
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-sql-primary font-mono text-lg">▶</span>
-                <h3 className="font-display font-semibold text-accent group-hover:text-sql-primary transition-colors">
-                  SQL Mission Control
-                </h3>
-              </div>
-              <p className="text-accent-muted text-sm leading-relaxed mb-4">
-                Web game latihan SQL bertema terminal. Nulis query nyata ke SQLite yang jalan di browser — JOIN, agregasi, subquery — dan validasi otomatis.
-              </p>
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {['SQL', 'React', 'WebAssembly', 'sql.js', 'CodeMirror'].map(tag => (
-                  <span key={tag} className="text-xs font-mono px-2 py-0.5 bg-surface-2 text-accent-muted rounded border border-border">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <button className="text-sm font-mono text-sql-primary hover:underline">
-                Play →
-              </button>
-            </div>
-          </div>
+          <SqlMissionCard navigate={navigate} />
 
           {filtered.map((project) => (
             <div key={getId(project)} className="min-h-[200px]">
@@ -211,6 +178,64 @@ export default function Projects({ projects }) {
         )}
       </AnimatePresence>
     </SectionWrapper>
+  )
+}
+
+function SqlMissionCard({ navigate }) {
+  const { ref, rotateX, rotateY, glareBg, onMouseMove, onMouseLeave } = useTilt(8)
+
+  return (
+    <div style={{ perspective: 900 }} className="h-full">
+      <motion.div
+        ref={ref}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        onClick={() => navigate('/sql-mission-control')}
+        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+        className="relative glass rounded-xl p-5 cursor-pointer h-full
+          border border-sql-primary/30 hover:border-sql-primary
+          hover:shadow-[0_0_20px_rgba(0,255,65,0.1)]
+          transition-colors duration-200 group"
+      >
+        {/* Badge */}
+        <div className="absolute top-3 right-3 z-10">
+          <span className="text-[10px] font-mono px-2 py-0.5 bg-sql-primary/10 text-sql-primary rounded border border-sql-primary/30 font-semibold">
+            Interactive
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-sql-primary font-mono">▶</span>
+          <h3 className="font-semibold text-accent group-hover:text-sql-primary transition-colors">
+            SQL Mission Control
+          </h3>
+        </div>
+        <p className="text-sm text-accent-muted mb-4 line-clamp-3">
+          Web game latihan SQL bertema terminal. Nulis query nyata ke SQLite yang jalan di browser — JOIN, agregasi, subquery — dan validasi otomatis.
+        </p>
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {['SQL', 'React', 'WebAssembly', 'sql.js', 'CodeMirror'].map(tag => (
+            <span key={tag} className="text-xs px-2 py-0.5 rounded bg-surface-2 text-accent-muted">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); navigate('/sql-mission-control') }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold
+            bg-sql-primary/10 text-sql-primary border border-sql-primary/30
+            hover:bg-sql-primary hover:text-background transition-all duration-200"
+        >
+          Play →
+        </button>
+
+        {/* Glare */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none rounded-xl z-10"
+          style={{ background: glareBg }}
+        />
+      </motion.div>
+    </div>
   )
 }
 

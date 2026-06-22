@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Link, Upload, Search, ToggleLeft, ToggleRight, Pencil, Trash2 } from 'lucide-react'
+import * as XLSX from 'xlsx'
 import AdminLayout from '../../components/layout/AdminLayout'
 import {
   adminGetSqlDatasets, adminDeleteSqlDataset, adminToggleSqlDataset,
@@ -10,6 +11,19 @@ import {
 import { useConfirm } from '../../hooks/useConfirm'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import UciBrowserModal from './sql-game/UciBrowserModal'
+
+async function toUploadableFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase()
+  if (ext === 'xlsx' || ext === 'xls') {
+    const data = await file.arrayBuffer()
+    const wb = XLSX.read(data, { type: 'array' })
+    const sheet = wb.Sheets[wb.SheetNames[0]]
+    const csv = XLSX.utils.sheet_to_csv(sheet)
+    const baseName = file.name.replace(/\.[^.]+$/, '') + '.csv'
+    return new File([csv], baseName, { type: 'text/csv' })
+  }
+  return file
+}
 
 const sourceLabel = { uci: 'UCI', url: 'URL', upload: 'Upload' }
 
@@ -67,14 +81,15 @@ export default function SqlGameDatasets() {
   }
 
   const handleUpload = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    const name = prompt('Nama dataset:', file.name.replace(/\.[^.]+$/, ''))
+    const rawFile = e.target.files[0]
+    if (!rawFile) return
+    const name = prompt('Nama dataset:', rawFile.name.replace(/\.[^.]+$/, ''))
     if (!name) return
-    const form = new FormData()
-    form.append('file', file)
-    form.append('name', name)
     try {
+      const file = await toUploadableFile(rawFile)
+      const form = new FormData()
+      form.append('file', file)
+      form.append('name', name)
       const preview = await adminUploadDataset(form)
       navigate('/binn/sql-game/datasets/new', { state: { preview: { ...preview, name, source: 'upload' } } })
     } catch (e) {
@@ -99,7 +114,7 @@ export default function SqlGameDatasets() {
             </button>
             <label className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-border rounded-md text-accent hover:border-accent transition cursor-pointer">
               <Upload size={14} /> Upload
-              <input type="file" accept=".csv,.json,.txt" className="hidden" onChange={handleUpload} />
+              <input type="file" accept=".csv,.json,.txt,.xlsx,.xls" className="hidden" onChange={handleUpload} />
             </label>
           </div>
         </div>

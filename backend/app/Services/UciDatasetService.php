@@ -29,14 +29,32 @@ class UciDatasetService
         $name = $meta['name'] ?? "UCI Dataset {$uciId}";
         $description = $meta['abstract'] ?? '';
 
-        // 2. Build download URL (UCI pattern: /static/public/{id}/{slug}.zip)
-        $slug = strtolower(str_replace([' ', '-'], '_', $name));
-        $zipUrl = "https://archive.ics.uci.edu/static/public/{$uciId}/{$slug}.zip";
+        // 2. Build download URL — UCI uses lowercase name with spaces as '+'
+        // e.g. "Breast Cancer" → "breast+cancer.zip"
+        $slugPlus  = strtolower(preg_replace('/[^a-zA-Z0-9 ]/', '', $name));
+        $slugPlus  = preg_replace('/\s+/', '+', trim($slugPlus));
+        $slugUnder = str_replace('+', '_', $slugPlus);
 
-        // 3. Download ZIP
-        $zipResponse = Http::timeout(30)->get($zipUrl);
-        if (!$zipResponse->ok()) {
-            throw new \RuntimeException("Gagal mengunduh dataset: HTTP {$zipResponse->status()} dari {$zipUrl}");
+        $candidates = [
+            "https://archive.ics.uci.edu/static/public/{$uciId}/{$slugPlus}.zip",
+            "https://archive.ics.uci.edu/static/public/{$uciId}/{$slugUnder}.zip",
+        ];
+
+        $zipUrl   = null;
+        $zipResponse = null;
+        foreach ($candidates as $candidate) {
+            $r = Http::timeout(30)->get($candidate);
+            if ($r->ok()) {
+                $zipUrl      = $candidate;
+                $zipResponse = $r;
+                break;
+            }
+        }
+
+        if (!$zipUrl || !$zipResponse) {
+            throw new \RuntimeException(
+                "Gagal mengunduh dataset. URL dicoba: " . implode(', ', $candidates)
+            );
         }
         $zipContent = $zipResponse->body();
 

@@ -108,9 +108,15 @@ class AdminSqlDatasetController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt,json|max:5120',
+            'file' => 'required|file|max:10240',
             'name' => 'required|string|max:255',
         ]);
+
+        $allowed = ['csv', 'txt', 'json', 'xlsx', 'xls'];
+        $ext     = strtolower($request->file('file')->getClientOriginalExtension());
+        if (!in_array($ext, $allowed)) {
+            return response()->json(['error' => 'Format file tidak didukung. Gunakan CSV, JSON, atau Excel (.xlsx/.xls)'], 422);
+        }
 
         try {
             $result = $this->parserService->parseFromUpload($request->file('file'));

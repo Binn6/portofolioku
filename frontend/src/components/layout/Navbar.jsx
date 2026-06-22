@@ -68,8 +68,8 @@ export default function Navbar() {
             ))}
             <button
               onClick={() => navigate('/sql-mission-control')}
-              className="text-sm font-mono px-2.5 py-1 rounded border border-sql-primary/40 text-sql-primary
-                hover:border-sql-primary hover:shadow-[0_0_8px_rgba(0,255,65,0.25)] transition-all duration-200"
+              className="text-xs font-mono px-4 py-1.5 ml-3 rounded-full border border-sql-primary/40 text-sql-primary
+                hover:border-sql-primary hover:bg-sql-primary/10 hover:shadow-[0_0_10px_rgba(0,255,65,0.2)] transition-all duration-200"
             >
               SQL Lab ↗
             </button>

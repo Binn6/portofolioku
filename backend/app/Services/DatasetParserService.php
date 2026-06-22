@@ -13,9 +13,11 @@ class DatasetParserService
         $filename = $file->getClientOriginalName();
         $ext      = strtolower($file->getClientOriginalExtension());
 
-        return $ext === 'json'
-            ? $this->parseJson($content, $filename)
-            : $this->parseCsv($content, $filename);
+        if ($ext === 'json') {
+            return $this->parseJson($content, $filename);
+        }
+
+        return $this->parseCsv($content, $filename);
     }
 
     public function parseFromUrl(string $url): array
