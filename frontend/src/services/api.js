@@ -84,4 +84,54 @@ export const adminDeleteConversation = (sessionId) => api.delete(`/admin/chat/${
 export const chatSend = (data) => api.post('/chat', data)
 export const chatPoll = (sessionId) => api.get(`/chat/${sessionId}`)
 
+// ─── SQL GAME — Public ────────────────────────────────────────
+export const getSqlGameConfig = () =>
+  api.get('/sql-game/config').then(r => r.data)
+
+// ─── SQL GAME — Admin Datasets ───────────────────────────────
+export const adminGetSqlDatasets = () =>
+  api.get('/admin/sql-game/datasets').then(r => r.data)
+
+export const adminCreateSqlDataset = (data) =>
+  api.post('/admin/sql-game/datasets', data).then(r => r.data)
+
+export const adminUpdateSqlDataset = (id, data) =>
+  api.put(`/admin/sql-game/datasets/${id}`, data).then(r => r.data)
+
+export const adminDeleteSqlDataset = (id) =>
+  api.delete(`/admin/sql-game/datasets/${id}`).then(r => r.data)
+
+export const adminToggleSqlDataset = (id) =>
+  api.patch(`/admin/sql-game/datasets/${id}/toggle`).then(r => r.data)
+
+export const adminFetchUciDataset = (uciId) =>
+  api.post('/admin/sql-game/datasets/fetch-uci', { uci_id: uciId }).then(r => r.data)
+
+export const adminFetchUrlDataset = (url) =>
+  api.post('/admin/sql-game/datasets/fetch-url', { url }).then(r => r.data)
+
+export const adminUploadDataset = (formData) =>
+  api.post('/admin/sql-game/datasets/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then(r => r.data)
+
+export const adminGetUciList = () =>
+  api.get('/admin/sql-game/datasets/uci-list').then(r => r.data)
+
+// ─── SQL GAME — Admin Missions ────────────────────────────────
+export const adminGetSqlMissions = (datasetId) =>
+  api.get('/admin/sql-game/missions', { params: datasetId ? { dataset_id: datasetId } : {} }).then(r => r.data)
+
+export const adminCreateSqlMission = (data) =>
+  api.post('/admin/sql-game/missions', data).then(r => r.data)
+
+export const adminUpdateSqlMission = (id, data) =>
+  api.put(`/admin/sql-game/missions/${id}`, data).then(r => r.data)
+
+export const adminDeleteSqlMission = (id) =>
+  api.delete(`/admin/sql-game/missions/${id}`).then(r => r.data)
+
+export const adminReorderSqlMissions = (order) =>
+  api.post('/admin/sql-game/missions/reorder', { order }).then(r => r.data)
+
 export default api
