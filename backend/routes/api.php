@@ -30,6 +30,9 @@ Route::post('/contact', [ContactController::class, 'store'])->middleware('thrott
 Route::post('/chat', [ChatController::class, 'send'])->middleware('throttle:30,1');
 Route::get('/chat/{sessionId}', [ChatController::class, 'messages'])->middleware('throttle:60,1');
 
+// ── SQL GAME — Public ───────────────────────────────────────
+Route::get('/sql-game/config', [\App\Http\Controllers\Api\SqlGameController::class, 'config']);
+
 // Auth
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
@@ -74,4 +77,22 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::post('/certificates', [AdminCertificateController::class, 'store']);
     Route::match(['PUT', 'POST'], '/certificates/{id}', [AdminCertificateController::class, 'update']);
     Route::delete('/certificates/{id}', [AdminCertificateController::class, 'destroy']);
+
+    // ── SQL GAME — Admin Datasets ────────────────────────────────
+    Route::get('/sql-game/datasets',               [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'index']);
+    Route::post('/sql-game/datasets',              [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'store']);
+    Route::put('/sql-game/datasets/{id}',          [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'update']);
+    Route::delete('/sql-game/datasets/{id}',       [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'destroy']);
+    Route::patch('/sql-game/datasets/{id}/toggle', [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'toggle']);
+    Route::post('/sql-game/datasets/fetch-uci',    [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'fetchUci']);
+    Route::post('/sql-game/datasets/fetch-url',    [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'fetchUrl']);
+    Route::post('/sql-game/datasets/upload',       [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'upload']);
+    Route::get('/sql-game/datasets/uci-list',      [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'uciList']);
+
+    // ── SQL GAME — Admin Missions ────────────────────────────────
+    Route::get('/sql-game/missions',               [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'index']);
+    Route::post('/sql-game/missions',              [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'store']);
+    Route::put('/sql-game/missions/{id}',          [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'update']);
+    Route::delete('/sql-game/missions/{id}',       [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'destroy']);
+    Route::post('/sql-game/missions/reorder',      [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'reorder']);
 });
