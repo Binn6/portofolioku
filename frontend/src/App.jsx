@@ -18,6 +18,7 @@ import More from './pages/admin/More'
 import SqlGameDatasets from './pages/admin/SqlGameDatasets'
 import SqlGameMissions from './pages/admin/SqlGameMissions'
 import DatasetEditor from './pages/admin/sql-game/DatasetEditor'
+import SqlMissionControl from './pages/SqlMissionControl'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Portfolio />} />
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/sql-mission-control" element={<SqlMissionControl />} />
           <Route path="/:section" element={<Portfolio />} />
           <Route path="/binn/login" element={<Login />} />
           <Route path="/binn" element={<Navigate to="/binn/dashboard" replace />} />
