@@ -34,12 +34,13 @@ class UciDatasetService
         $zipUrl = "https://archive.ics.uci.edu/static/public/{$uciId}/{$slug}.zip";
 
         // 3. Download ZIP
-        $zipContent = Http::timeout(30)->get($zipUrl)->body();
-        if (empty($zipContent)) {
-            throw new \RuntimeException("Gagal mengunduh dataset dari {$zipUrl}");
+        $zipResponse = Http::timeout(30)->get($zipUrl);
+        if (!$zipResponse->ok()) {
+            throw new \RuntimeException("Gagal mengunduh dataset: HTTP {$zipResponse->status()} dari {$zipUrl}");
         }
+        $zipContent = $zipResponse->body();
 
-        $tmpZip = tempnam(sys_get_temp_dir(), 'uci_') . '.zip';
+        $tmpZip = tempnam(sys_get_temp_dir(), 'uci_zip_');
         file_put_contents($tmpZip, $zipContent);
 
         // 4. Extract to temp dir
@@ -56,10 +57,11 @@ class UciDatasetService
         unlink($tmpZip);
 
         // 5. Find data + names files
-        $files = array_diff(scandir($tmpDir), ['.', '..']);
+        // Recursively find data and names files in extracted directory
+        $allFiles = $this->listFilesRecursive($tmpDir);
         $dataFile = null;
         $namesFile = null;
-        foreach ($files as $f) {
+        foreach ($allFiles as $f) {
             $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
             if (in_array($ext, ['data', 'csv']) && !$dataFile) $dataFile = $f;
             if ($ext === 'names') $namesFile = $f;
@@ -73,10 +75,10 @@ class UciDatasetService
         // 6. Parse
         $tableName = preg_replace('/[^a-z0-9]/', '_', strtolower($name));
         $columns = $namesFile
-            ? $this->parseColumnNames("{$tmpDir}/{$namesFile}")
+            ? $this->parseColumnNames($namesFile)
             : null;
 
-        $rawContent = file_get_contents("{$tmpDir}/{$dataFile}");
+        $rawContent = file_get_contents($dataFile);
         $lines = array_filter(explode("\n", trim($rawContent)), fn($l) => trim($l) !== '');
         $rows = array_map(fn($l) => str_getcsv(trim($l)), array_slice($lines, 0, 500));
 
@@ -131,7 +133,7 @@ class UciDatasetService
             $vals = [];
             foreach ($cols as $i => $col) {
                 $v = trim($row[$i] ?? '');
-                $vals[] = $v === '' ? 'NULL' : "'" . addslashes($v) . "'";
+                $vals[] = $v === '' ? 'NULL' : "'" . str_replace("'", "''", $v) . "'";
             }
             $seed .= "INSERT INTO {$table} (" . implode(', ', $cols) . ") VALUES (" . implode(', ', $vals) . ");\n";
         }
@@ -143,8 +145,23 @@ class UciDatasetService
     {
         if (!is_dir($dir)) return;
         foreach (array_diff(scandir($dir), ['.', '..']) as $f) {
-            unlink("{$dir}/{$f}");
+            $path = "{$dir}/{$f}";
+            is_dir($path) ? $this->cleanupDir($path) : unlink($path);
         }
         rmdir($dir);
+    }
+
+    private function listFilesRecursive(string $dir): array
+    {
+        $result = [];
+        foreach (array_diff(scandir($dir), ['.', '..']) as $f) {
+            $path = "{$dir}/{$f}";
+            if (is_dir($path)) {
+                $result = array_merge($result, $this->listFilesRecursive($path));
+            } else {
+                $result[] = $path;
+            }
+        }
+        return $result;
     }
 }
