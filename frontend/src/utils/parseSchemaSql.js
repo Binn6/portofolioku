@@ -21,6 +21,7 @@ export function parseSchemaSql(schemaSql) {
           !upper.startsWith('PRIMARY') &&
           !upper.startsWith('UNIQUE') &&
           !upper.startsWith('FOREIGN') &&
+          !upper.startsWith('CONSTRAINT') &&
           !upper.startsWith('CHECK') &&
           !upper.startsWith('--')
         )
