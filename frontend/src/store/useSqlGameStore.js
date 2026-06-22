@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { parseSchemaSql } from '../utils/parseSchemaSql'
 
 const RANK_PROGRESSION = [
   'Script Kiddie',
@@ -76,6 +77,11 @@ export const useSqlGameStore = create((set, get) => ({
     const { subchapters, selectedDataset } = get()
     if (!selectedDataset?.subchapter_id) return null
     return subchapters.find(s => s.id === selectedDataset.subchapter_id) ?? null
+  },
+
+  getDbSchema: () => {
+    const { selectedDataset } = get()
+    return parseSchemaSql(selectedDataset?.schema_sql ?? '')
   },
 
   solveMission: (missionId) => {
