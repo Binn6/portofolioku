@@ -74,6 +74,7 @@ function rowsEqual(a, b) {
 function buildCheckedCols(userCols, objectives) {
   const result = {}
   for (const obj of objectives) {
+    if (!obj) continue
     result[obj] = userCols.includes(obj.toLowerCase())
   }
   return result
