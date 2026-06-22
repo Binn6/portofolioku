@@ -66,6 +66,13 @@ export default function Navbar() {
                 {l.label}
               </button>
             ))}
+            <button
+              onClick={() => navigate('/sql-mission-control')}
+              className="text-sm font-mono px-2.5 py-1 rounded border border-sql-primary/40 text-sql-primary
+                hover:border-sql-primary hover:shadow-[0_0_8px_rgba(0,255,65,0.25)] transition-all duration-200"
+            >
+              SQL Lab ↗
+            </button>
           </nav>
         </div>
       </motion.div>
@@ -111,6 +118,13 @@ export default function Navbar() {
                   {l.label}
                 </button>
               ))}
+              <button
+                onClick={() => { navigate('/sql-mission-control'); setOpen(false) }}
+                className="mx-3 mb-1 mt-1 px-4 py-2 text-sm font-mono rounded border border-sql-primary/40 text-sql-primary
+                  hover:border-sql-primary hover:bg-surface-2 transition-all duration-200 text-left"
+              >
+                SQL Lab ↗
+              </button>
             </nav>
           </motion.div>
         )}
