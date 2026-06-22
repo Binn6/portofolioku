@@ -5,7 +5,7 @@ export function EditorToolbar({ charCount, onRun, onDeploy, isInitializing }) {
   return (
     <div className="flex items-center justify-between px-3 py-2 border border-border border-t-0 rounded-b bg-surface">
       <span className="text-xs font-mono text-sql-dim">
-        {charCount} chars · <span className="opacity-60">⌃↵ run · ⌃⇧↵ deploy</span>
+        {charCount} chars · <span className="opacity-60">Ctrl+Enter run · Ctrl+Shift+Enter deploy</span>
       </span>
       <div className="flex gap-2">
         {isInitializing ? (

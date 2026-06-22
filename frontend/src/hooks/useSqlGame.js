@@ -16,11 +16,28 @@ export function useSqlGame() {
   const handleDeploy = () => {
     const { db, queryText } = store
     const mission = store.getCurrentMission()
-    if (!db || !queryText.trim() || !mission) return
+
+    if (!db) {
+      store.setLastResult({ error: 'Database belum siap. Coba refresh halaman.' })
+      return
+    }
+    if (!queryText.trim()) {
+      store.setLastResult({ error: 'Tulis query SQL terlebih dahulu.' })
+      return
+    }
+    if (!mission) {
+      store.setLastResult({ error: 'Tidak ada misi yang aktif.' })
+      return
+    }
 
     const userResult = runQuery(db, queryText)
     if (userResult.error) {
       store.setLastResult(userResult)
+      return
+    }
+
+    if (!mission.solution_query) {
+      store.setLastResult({ error: 'Kesalahan internal: misi tidak memiliki query solusi.' })
       return
     }
 
@@ -30,20 +47,24 @@ export function useSqlGame() {
       return
     }
 
-    const objectiveCols = (mission.objectives || []).map(o => o.col)
-    const { pass, diffs, checkedCols } = compareResults(
-      userResult,
-      expectedResult,
-      { ordered: mission.ordered, objectives: objectiveCols }
-    )
+    try {
+      const objectiveCols = (mission.objectives || []).map(o => o.col)
+      const { pass, diffs, checkedCols } = compareResults(
+        userResult,
+        expectedResult,
+        { ordered: mission.ordered, objectives: objectiveCols }
+      )
 
-    store.setLastResult({
-      ...userResult,
-      deployResult: { pass, diffs, checkedCols },
-    })
+      store.setLastResult({
+        ...userResult,
+        deployResult: { pass, diffs, checkedCols },
+      })
 
-    if (pass) {
-      store.solveMission(mission.id)
+      if (pass) {
+        store.solveMission(mission.id)
+      }
+    } catch (err) {
+      store.setLastResult({ error: `Kesalahan internal: ${err.message}` })
     }
   }
 
