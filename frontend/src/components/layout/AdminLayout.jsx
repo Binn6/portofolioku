@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import {
   LayoutDashboard, FolderKanban, Wrench, Briefcase,
   GraduationCap, Award, FileText, MessageSquare, User,
-  LogOut, Menu, X, Grid2x2,
+  LogOut, Menu, X, Grid2x2, Database,
 } from 'lucide-react'
 
 const navItems = [
@@ -18,6 +18,7 @@ const navItems = [
   { to: '/binn/certificates',icon: Award,           label: 'Certificates' },
   { to: '/binn/cv',          icon: FileText,        label: 'CV' },
   { to: '/binn/messages',    icon: MessageSquare,   label: 'Messages' },
+  { to: '/binn/sql-game/datasets', icon: Database, label: 'SQL Game' },
 ]
 
 export default function AdminLayout({ children }) {
