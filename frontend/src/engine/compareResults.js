@@ -1,8 +1,8 @@
 export function compareResults(userResult, expectedResult, { ordered, objectives = [] }) {
   const diffs = []
 
-  const userCols = userResult.columns.map(c => c.toLowerCase())
-  const expCols  = expectedResult.columns.map(c => c.toLowerCase())
+  const userCols = userResult.columns.map(c => (c ?? '').toLowerCase())
+  const expCols  = expectedResult.columns.map(c => (c ?? '').toLowerCase())
 
   for (const col of expCols) {
     if (!userCols.includes(col)) {
@@ -15,7 +15,7 @@ export function compareResults(userResult, expectedResult, { ordered, objectives
   }
 
   const normalise = (row, srcCols) => {
-    const srcLower = srcCols.map(c => c.toLowerCase())
+    const srcLower = srcCols.map(c => (c ?? '').toLowerCase())
     return expCols.map(col => normaliseValue(row[srcLower.indexOf(col)]))
   }
 
