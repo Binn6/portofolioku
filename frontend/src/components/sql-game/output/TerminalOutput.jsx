@@ -34,15 +34,6 @@ export function TerminalOutput({ result }) {
         </div>
       )}
 
-      {/* Deploy diffs */}
-      {deployResult && !deployResult.pass && deployResult.diffs.length > 0 && (
-        <div className="p-3 border-b border-border flex-shrink-0">
-          {deployResult.diffs.map((d, i) => (
-            <p key={i} className="text-xs font-mono text-red-400">▶ {d}</p>
-          ))}
-        </div>
-      )}
-
       {/* Result grid or empty state */}
       <div className="flex-1 min-h-0">
         {!result || (!result.columns && !result.error) ? (

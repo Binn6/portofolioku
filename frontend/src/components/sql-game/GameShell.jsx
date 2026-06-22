@@ -9,6 +9,7 @@ import { SchemaPanel } from './sidebar/SchemaPanel'
 import { SqlEditor } from './editor/SqlEditor'
 import { EditorToolbar } from './editor/EditorToolbar'
 import { TerminalOutput } from './output/TerminalOutput'
+import { DeployHint } from './output/DeployHint'
 import { StageFooter } from './StageFooter'
 import { SqlGameNavbar } from './SqlGameNavbar'
 
@@ -96,6 +97,8 @@ export function GameShell() {
                 isInitializing={isInitializingDb}
               />
             </div>
+
+            <DeployHint deployResult={lastResult?.deployResult} />
 
             {/* Output section */}
             <div className="flex-1 min-h-0">
