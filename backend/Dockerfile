@@ -28,11 +28,10 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interactio
 
 COPY . .
 
-# Build-time bootstrap: use safe dummy values so artisan can boot without real DB/Cloudinary
+# Build-time bootstrap: discover packages only (route:cache runs at start with real env)
 RUN printf 'APP_KEY=base64:%s\nAPP_ENV=production\nSESSION_DRIVER=array\nCACHE_STORE=array\nDB_CONNECTION=mongodb\nMONGODB_URI=mongodb://localhost/dummy\n' \
         "$(openssl rand -base64 32)" > .env \
     && php artisan package:discover --ansi \
-    && php artisan route:cache \
     && rm .env
 
 RUN chown -R www-data:www-data storage bootstrap/cache \
