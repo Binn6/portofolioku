@@ -85,35 +85,43 @@ class AdminSqlMissionController extends Controller
 
     public function fixObjectives()
     {
-        $missions = SqlMission::all();
-        $fixed = 0;
-        $skipped = 0;
+        try {
+            $missions = SqlMission::all();
+            $fixed = 0;
+            $skipped = 0;
 
-        foreach ($missions as $mission) {
-            $objectives = $mission->objectives ?? [];
-            if (empty($objectives)) continue;
+            foreach ($missions as $mission) {
+                // Normalise to plain PHP arrays regardless of BSON driver format
+                $objectives = array_map(
+                    fn($o) => is_array($o) ? $o : (array) $o,
+                    $mission->objectives ?? []
+                );
+                if (empty($objectives)) continue;
 
-            $hasEmpty = collect($objectives)->some(fn($o) => empty($o['col'] ?? ''));
-            if (!$hasEmpty) continue;
+                $hasEmpty = collect($objectives)->some(fn($o) => empty($o['col'] ?? ''));
+                if (!$hasEmpty) continue;
 
-            $cols = $this->parseSelectColumns($mission->solution_query ?? '');
-            if (empty($cols)) { $skipped++; continue; }
+                $cols = $this->parseSelectColumns($mission->solution_query ?? '');
+                if (empty($cols)) { $skipped++; continue; }
 
-            $colIdx = 0;
-            $updated = array_map(function ($obj) use (&$colIdx, $cols) {
-                if (empty($obj['col'] ?? '')) {
-                    $obj['col'] = $cols[$colIdx] ?? '';
-                }
-                $colIdx++;
-                return $obj;
-            }, $objectives);
+                $colIdx = 0;
+                $updated = array_map(function (array $obj) use (&$colIdx, $cols) {
+                    if (empty($obj['col'] ?? '')) {
+                        $obj['col'] = $cols[$colIdx] ?? '';
+                    }
+                    $colIdx++;
+                    return $obj;
+                }, $objectives);
 
-            $mission->objectives = $updated;
-            $mission->save();
-            $fixed++;
+                $mission->objectives = $updated;
+                $mission->save();
+                $fixed++;
+            }
+
+            return response()->json(['fixed' => $fixed, 'skipped' => $skipped]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        return response()->json(['fixed' => $fixed, 'skipped' => $skipped]);
     }
 
     private function parseSelectColumns(string $sql): array
