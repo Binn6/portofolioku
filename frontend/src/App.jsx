@@ -15,6 +15,8 @@ import Messages from './pages/admin/Messages'
 import AdminProfile from './pages/admin/Profile'
 import AdminChat from './pages/admin/Chat'
 import More from './pages/admin/More'
+import SqlGameChapters from './pages/admin/SqlGameChapters'
+import SqlGameSubchapters from './pages/admin/SqlGameSubchapters'
 import SqlGameDatasets from './pages/admin/SqlGameDatasets'
 import SqlGameMissions from './pages/admin/SqlGameMissions'
 import DatasetEditor from './pages/admin/sql-game/DatasetEditor'
@@ -42,6 +44,8 @@ export default function App() {
           <Route path="/binn/chat"         element={<RequireAuth><AdminChat /></RequireAuth>} />
           <Route path="/binn/messages"     element={<RequireAuth><Messages /></RequireAuth>} />
           <Route path="/binn/more"         element={<RequireAuth><More /></RequireAuth>} />
+          <Route path="/binn/sql-game/chapters"       element={<RequireAuth><SqlGameChapters /></RequireAuth>} />
+          <Route path="/binn/sql-game/subchapters"    element={<RequireAuth><SqlGameSubchapters /></RequireAuth>} />
           <Route path="/binn/sql-game/datasets"        element={<RequireAuth><SqlGameDatasets /></RequireAuth>} />
           <Route path="/binn/sql-game/datasets/new"    element={<RequireAuth><DatasetEditor /></RequireAuth>} />
           <Route path="/binn/sql-game/datasets/:id/edit" element={<RequireAuth><DatasetEditor /></RequireAuth>} />

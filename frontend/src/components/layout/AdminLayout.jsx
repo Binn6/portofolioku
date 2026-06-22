@@ -5,20 +5,23 @@ import { useAuth } from '../../hooks/useAuth'
 import {
   LayoutDashboard, FolderKanban, Wrench, Briefcase,
   GraduationCap, Award, FileText, MessageSquare, User,
-  LogOut, Menu, X, Grid2x2, Database,
+  LogOut, Menu, X, Grid2x2, Database, Layers, FolderOpen, Target,
 } from 'lucide-react'
 
 const navItems = [
-  { to: '/binn/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/binn/profile',     icon: User,            label: 'Profile' },
-  { to: '/binn/projects',    icon: FolderKanban,    label: 'Projects' },
-  { to: '/binn/skills',      icon: Wrench,          label: 'Skills' },
-  { to: '/binn/experiences', icon: Briefcase,       label: 'Experiences' },
-  { to: '/binn/education',   icon: GraduationCap,   label: 'Education' },
-  { to: '/binn/certificates',icon: Award,           label: 'Certificates' },
-  { to: '/binn/cv',          icon: FileText,        label: 'CV' },
-  { to: '/binn/messages',    icon: MessageSquare,   label: 'Messages' },
-  { to: '/binn/sql-game/datasets', icon: Database, label: 'SQL Game' },
+  { to: '/binn/dashboard',            icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/binn/profile',              icon: User,            label: 'Profile' },
+  { to: '/binn/projects',             icon: FolderKanban,    label: 'Projects' },
+  { to: '/binn/skills',               icon: Wrench,          label: 'Skills' },
+  { to: '/binn/experiences',          icon: Briefcase,       label: 'Experiences' },
+  { to: '/binn/education',            icon: GraduationCap,   label: 'Education' },
+  { to: '/binn/certificates',         icon: Award,           label: 'Certificates' },
+  { to: '/binn/cv',                   icon: FileText,        label: 'CV' },
+  { to: '/binn/messages',             icon: MessageSquare,   label: 'Messages' },
+  { to: '/binn/sql-game/chapters',    icon: Layers,          label: 'SQL Chapters' },
+  { to: '/binn/sql-game/subchapters', icon: FolderOpen,      label: 'SQL Sub-BAB' },
+  { to: '/binn/sql-game/datasets',    icon: Database,        label: 'SQL Datasets' },
+  { to: '/binn/sql-game/missions',    icon: Target,          label: 'SQL Missions' },
 ]
 
 export default function AdminLayout({ children }) {

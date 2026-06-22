@@ -3,30 +3,29 @@ import { Loader2 } from 'lucide-react'
 import { useSqlGameStore } from '../store/useSqlGameStore'
 import { useDatabase } from '../hooks/useDatabase'
 import { getSqlGameConfig } from '../services/api'
+import { LearningPathSelector } from '../components/sql-game/LearningPathSelector'
 import { DatabaseSelector } from '../components/sql-game/DatabaseSelector'
 import { GameShell } from '../components/sql-game/GameShell'
 
 export default function SqlMissionControl() {
   const {
-    datasets, isLoading, selectedDataset, db,
-    setApiData, selectDataset, isInitializingDb,
+    datasets, chapters, subchapters, isLoading,
+    selectedDataset, db, setApiData, selectDataset, isInitializingDb,
   } = useSqlGameStore()
 
-  // Init sql.js when dataset selected
   useDatabase()
 
   useEffect(() => {
     getSqlGameConfig()
-      .then(({ datasets, missions }) => {
-        setApiData(datasets, missions)
-        // Auto-select if only one active dataset
+      .then(({ datasets, missions, chapters = [], subchapters = [] }) => {
+        setApiData(datasets, missions, chapters, subchapters)
         if (datasets.length === 1) {
           selectDataset(datasets[0])
         }
       })
       .catch(err => {
         console.error('Failed to load sql game config:', err)
-        setApiData([], [])
+        setApiData([], [], [], [])
       })
   }, [])
 
@@ -50,12 +49,17 @@ export default function SqlMissionControl() {
   }
 
   if (!selectedDataset || (!db && !isInitializingDb)) {
-    return (
-      <DatabaseSelector
-        datasets={datasets}
-        onSelect={selectDataset}
-      />
-    )
+    if (chapters.length > 0) {
+      return (
+        <LearningPathSelector
+          chapters={chapters}
+          subchapters={subchapters}
+          datasets={datasets}
+          onSelect={selectDataset}
+        />
+      )
+    }
+    return <DatabaseSelector datasets={datasets} onSelect={selectDataset} />
   }
 
   if (isInitializingDb) {

@@ -84,6 +84,32 @@ export const adminDeleteConversation = (sessionId) => api.delete(`/admin/chat/${
 export const chatSend = (data) => api.post('/chat', data)
 export const chatPoll = (sessionId) => api.get(`/chat/${sessionId}`)
 
+// ─── SQL GAME — Admin Chapters ───────────────────────────────
+export const adminGetSqlChapters = () =>
+  api.get('/admin/sql-game/chapters').then(r => r.data)
+
+export const adminCreateSqlChapter = (data) =>
+  api.post('/admin/sql-game/chapters', data).then(r => r.data)
+
+export const adminUpdateSqlChapter = (id, data) =>
+  api.put(`/admin/sql-game/chapters/${id}`, data).then(r => r.data)
+
+export const adminDeleteSqlChapter = (id) =>
+  api.delete(`/admin/sql-game/chapters/${id}`).then(r => r.data)
+
+// ─── SQL GAME — Admin Subchapters ────────────────────────────
+export const adminGetSqlSubchapters = (chapterId) =>
+  api.get('/admin/sql-game/subchapters', { params: chapterId ? { chapter_id: chapterId } : {} }).then(r => r.data)
+
+export const adminCreateSqlSubchapter = (data) =>
+  api.post('/admin/sql-game/subchapters', data).then(r => r.data)
+
+export const adminUpdateSqlSubchapter = (id, data) =>
+  api.put(`/admin/sql-game/subchapters/${id}`, data).then(r => r.data)
+
+export const adminDeleteSqlSubchapter = (id) =>
+  api.delete(`/admin/sql-game/subchapters/${id}`).then(r => r.data)
+
 // ─── SQL GAME — Public ────────────────────────────────────────
 export const getSqlGameConfig = () =>
   api.get('/sql-game/config').then(r => r.data)

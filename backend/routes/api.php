@@ -78,6 +78,18 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::match(['PUT', 'POST'], '/certificates/{id}', [AdminCertificateController::class, 'update']);
     Route::delete('/certificates/{id}', [AdminCertificateController::class, 'destroy']);
 
+    // ── SQL GAME — Admin Chapters ───────────────────────────────
+    Route::get('/sql-game/chapters',          [\App\Http\Controllers\Api\Admin\AdminSqlChapterController::class, 'index']);
+    Route::post('/sql-game/chapters',         [\App\Http\Controllers\Api\Admin\AdminSqlChapterController::class, 'store']);
+    Route::put('/sql-game/chapters/{id}',     [\App\Http\Controllers\Api\Admin\AdminSqlChapterController::class, 'update']);
+    Route::delete('/sql-game/chapters/{id}',  [\App\Http\Controllers\Api\Admin\AdminSqlChapterController::class, 'destroy']);
+
+    // ── SQL GAME — Admin Subchapters ─────────────────────────────
+    Route::get('/sql-game/subchapters',         [\App\Http\Controllers\Api\Admin\AdminSqlSubchapterController::class, 'index']);
+    Route::post('/sql-game/subchapters',        [\App\Http\Controllers\Api\Admin\AdminSqlSubchapterController::class, 'store']);
+    Route::put('/sql-game/subchapters/{id}',    [\App\Http\Controllers\Api\Admin\AdminSqlSubchapterController::class, 'update']);
+    Route::delete('/sql-game/subchapters/{id}', [\App\Http\Controllers\Api\Admin\AdminSqlSubchapterController::class, 'destroy']);
+
     // ── SQL GAME — Admin Datasets ────────────────────────────────
     Route::get('/sql-game/datasets',               [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'index']);
     Route::post('/sql-game/datasets',              [\App\Http\Controllers\Api\Admin\AdminSqlDatasetController::class, 'store']);

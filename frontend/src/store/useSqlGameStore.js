@@ -1,4 +1,3 @@
-// frontend/src/store/useSqlGameStore.js
 import { create } from 'zustand'
 
 const RANK_PROGRESSION = [
@@ -10,6 +9,8 @@ const RANK_PROGRESSION = [
 
 export const useSqlGameStore = create((set, get) => ({
   // From API
+  chapters: [],
+  subchapters: [],
   datasets: [],
   missions: [],
 
@@ -25,7 +26,8 @@ export const useSqlGameStore = create((set, get) => ({
   isInitializingDb: false,
 
   // Actions
-  setApiData: (datasets, missions) => set({ datasets, missions, isLoading: false }),
+  setApiData: (datasets, missions, chapters = [], subchapters = []) =>
+    set({ datasets, missions, chapters, subchapters, isLoading: false }),
 
   setQueryText: (text) => set({ queryText: text }),
 
@@ -62,6 +64,18 @@ export const useSqlGameStore = create((set, get) => ({
     return missions
       .filter(m => m.dataset_id === selectedDataset.id)
       .sort((a, b) => a.stage_order - b.stage_order)
+  },
+
+  getSelectedChapter: () => {
+    const { chapters, selectedDataset } = get()
+    if (!selectedDataset?.chapter_id) return null
+    return chapters.find(c => c.id === selectedDataset.chapter_id) ?? null
+  },
+
+  getSelectedSubchapter: () => {
+    const { subchapters, selectedDataset } = get()
+    if (!selectedDataset?.subchapter_id) return null
+    return subchapters.find(s => s.id === selectedDataset.subchapter_id) ?? null
   },
 
   solveMission: (missionId) => {

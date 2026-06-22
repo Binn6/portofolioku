@@ -15,7 +15,11 @@ export function GameShell() {
     rank, queryText, setQueryText, lastResult,
     solvedMissions, getDatasetMissions, getCurrentMission,
     currentMissionId, goToNextMission, goToPrevMission, isInitializingDb,
+    getSelectedChapter, getSelectedSubchapter,
   } = useSqlGameStore()
+
+  const chapter = getSelectedChapter()
+  const subchapter = getSelectedSubchapter()
 
   const { handleRun, handleDeploy } = useSqlGame()
 
@@ -42,6 +46,17 @@ export function GameShell() {
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
         <aside className="w-72 flex-shrink-0 border-r border-border flex flex-col overflow-y-auto p-4 gap-4 bg-surface">
+          {chapter && (
+            <div className="font-mono text-xs border-b border-border pb-3">
+              <p className="text-sql-dim uppercase tracking-widest mb-1">Modul</p>
+              <p className="font-semibold" style={{ color: chapter.color || '#00FF41' }}>
+                {chapter.name}
+              </p>
+              {subchapter && (
+                <p className="text-accent-muted mt-0.5">{subchapter.name}</p>
+              )}
+            </div>
+          )}
           <UserCard rank={rank} />
           {mission && (
             <>

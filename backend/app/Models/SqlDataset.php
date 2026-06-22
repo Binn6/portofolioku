@@ -11,6 +11,7 @@ class SqlDataset extends Model
     protected $fillable = [
         'name', 'description', 'source', 'source_ref',
         'schema_sql', 'seed_sql', 'is_active',
+        'chapter_id', 'subchapter_id',
     ];
 
     protected $casts = [

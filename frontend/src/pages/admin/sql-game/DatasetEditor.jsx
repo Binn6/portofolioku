@@ -5,11 +5,13 @@ import { Save, ArrowLeft } from 'lucide-react'
 import AdminLayout from '../../../components/layout/AdminLayout'
 import {
   adminCreateSqlDataset, adminUpdateSqlDataset, adminGetSqlDatasets,
+  adminGetSqlChapters, adminGetSqlSubchapters,
 } from '../../../services/api'
 
 const empty = {
   name: '', description: '', source: 'upload',
   source_ref: '', schema_sql: '', seed_sql: '', is_active: false,
+  chapter_id: '', subchapter_id: '',
 }
 
 export default function DatasetEditor() {
@@ -19,9 +21,12 @@ export default function DatasetEditor() {
   const [form, setForm] = useState(empty)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [chapters, setChapters] = useState([])
+  const [subchapters, setSubchapters] = useState([])
   const isNew = !id || id === 'new'
 
   useEffect(() => {
+    adminGetSqlChapters().then(setChapters)
     if (state?.preview) {
       setForm(f => ({ ...f, ...state.preview }))
     } else if (!isNew) {
@@ -31,6 +36,14 @@ export default function DatasetEditor() {
       })
     }
   }, [id])
+
+  useEffect(() => {
+    if (form.chapter_id) {
+      adminGetSqlSubchapters(form.chapter_id).then(setSubchapters)
+    } else {
+      setSubchapters([])
+    }
+  }, [form.chapter_id])
 
   const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
   const setCheck = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.checked }))
@@ -83,6 +96,30 @@ export default function DatasetEditor() {
                 <option value="uci">UCI ML Repository</option>
                 <option value="url">URL</option>
                 <option value="upload">Upload</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-accent-muted mb-1">Chapter (BAB)</label>
+              <select value={form.chapter_id} onChange={e => setForm(f => ({ ...f, chapter_id: e.target.value, subchapter_id: '' }))}
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-accent text-sm outline-none focus:border-accent">
+                <option value="">— Tidak terhubung —</option>
+                {chapters.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-accent-muted mb-1">Sub-Chapter</label>
+              <select value={form.subchapter_id} onChange={set('subchapter_id')}
+                disabled={!form.chapter_id}
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-accent text-sm outline-none focus:border-accent disabled:opacity-50">
+                <option value="">— Pilih chapter dulu —</option>
+                {subchapters.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
               </select>
             </div>
           </div>
