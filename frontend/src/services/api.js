@@ -160,4 +160,7 @@ export const adminDeleteSqlMission = (id) =>
 export const adminReorderSqlMissions = (order) =>
   api.post('/admin/sql-game/missions/reorder', { order }).then(r => r.data)
 
+export const adminFixSqlObjectives = () =>
+  api.post('/admin/sql-game/missions/fix-objectives').then(r => r.data)
+
 export default api

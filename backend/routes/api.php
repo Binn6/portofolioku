@@ -107,4 +107,5 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::put('/sql-game/missions/{id}',          [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'update']);
     Route::delete('/sql-game/missions/{id}',       [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'destroy']);
     Route::post('/sql-game/missions/reorder',      [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'reorder']);
+    Route::post('/sql-game/missions/fix-objectives', [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'fixObjectives']);
 });

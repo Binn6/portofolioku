@@ -20,7 +20,7 @@ import {
   adminGetSqlDatasets, adminCreateSqlDataset, adminUpdateSqlDataset, adminDeleteSqlDataset,
   adminToggleSqlDataset, adminFetchUrlDataset, adminUploadDataset,
   adminGetSqlMissions, adminCreateSqlMission, adminUpdateSqlMission,
-  adminDeleteSqlMission, adminReorderSqlMissions,
+  adminDeleteSqlMission, adminReorderSqlMissions, adminFixSqlObjectives,
 } from '../../services/api'
 import { useConfirm } from '../../hooks/useConfirm'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
@@ -538,6 +538,8 @@ function MissionsSection({ datasets, confirm }) {
   const [editId, setEditId]         = useState(null)
   const [saving, setSaving]         = useState(false)
   const [error, setError]           = useState('')
+  const [fixing, setFixing]         = useState(false)
+  const [fixMsg, setFixMsg]         = useState('')
   const sensors = useSensors(useSensor(PointerSensor))
 
   useEffect(() => { load() }, [filter])
@@ -566,6 +568,16 @@ function MissionsSection({ datasets, confirm }) {
     finally { setSaving(false) }
   }
 
+  const handleFix = async () => {
+    setFixing(true); setFixMsg('')
+    try {
+      const { fixed, skipped } = await adminFixSqlObjectives()
+      setFixMsg(`Selesai: ${fixed} mission diperbaiki, ${skipped} dilewati (SELECT * atau tidak bisa di-parse).`)
+      load()
+    } catch (e) { setFixMsg('Gagal: ' + (e.response?.data?.message || e.message)) }
+    finally { setFixing(false) }
+  }
+
   const handleDragEnd = async ({ active, over }) => {
     if (!over || active.id === over.id) return
     const reordered = arrayMove(missions, missions.findIndex(m => m.id === active.id), missions.findIndex(m => m.id === over.id))
@@ -581,10 +593,19 @@ function MissionsSection({ datasets, confirm }) {
           <option value="">Semua Dataset</option>
           {datasets.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </select>
-        <button onClick={openCreate} className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-accent text-background rounded-md font-medium">
-          <Plus size={14} /> Mission Baru
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={handleFix} disabled={fixing}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-border rounded-md text-accent-muted hover:text-accent hover:border-accent transition disabled:opacity-50">
+            {fixing ? 'Memproses...' : 'Auto-fix Objectives'}
+          </button>
+          <button onClick={openCreate} className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-accent text-background rounded-md font-medium">
+            <Plus size={14} /> Mission Baru
+          </button>
+        </div>
       </div>
+      {fixMsg && (
+        <p className="text-xs text-accent-muted mb-3 bg-surface border border-border rounded px-3 py-2">{fixMsg}</p>
+      )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={missions.map(m => m.id)} strategy={verticalListSortingStrategy}>

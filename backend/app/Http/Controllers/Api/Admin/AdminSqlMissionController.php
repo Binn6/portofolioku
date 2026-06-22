@@ -83,6 +83,82 @@ class AdminSqlMissionController extends Controller
         return response()->json(['message' => 'Mission dihapus']);
     }
 
+    public function fixObjectives()
+    {
+        $missions = SqlMission::all();
+        $fixed = 0;
+        $skipped = 0;
+
+        foreach ($missions as $mission) {
+            $objectives = $mission->objectives ?? [];
+            if (empty($objectives)) continue;
+
+            $hasEmpty = collect($objectives)->some(fn($o) => empty($o['col'] ?? ''));
+            if (!$hasEmpty) continue;
+
+            $cols = $this->parseSelectColumns($mission->solution_query ?? '');
+            if (empty($cols)) { $skipped++; continue; }
+
+            $colIdx = 0;
+            $updated = array_map(function ($obj) use (&$colIdx, $cols) {
+                if (empty($obj['col'] ?? '')) {
+                    $obj['col'] = $cols[$colIdx] ?? '';
+                }
+                $colIdx++;
+                return $obj;
+            }, $objectives);
+
+            $mission->objectives = $updated;
+            $mission->save();
+            $fixed++;
+        }
+
+        return response()->json(['fixed' => $fixed, 'skipped' => $skipped]);
+    }
+
+    private function parseSelectColumns(string $sql): array
+    {
+        $sql = preg_replace('/\s+/', ' ', trim($sql));
+
+        if (!preg_match('/^SELECT\s+(?:DISTINCT\s+)?(.+?)\s+FROM\s/is', $sql, $m)) {
+            return [];
+        }
+
+        $clause = $m[1];
+        if (trim($clause) === '*') return [];
+
+        // Split by comma while respecting parentheses depth
+        $parts = [];
+        $depth = 0;
+        $buf   = '';
+        for ($i = 0, $len = strlen($clause); $i < $len; $i++) {
+            $ch = $clause[$i];
+            if ($ch === '(') $depth++;
+            elseif ($ch === ')') $depth--;
+            elseif ($ch === ',' && $depth === 0) {
+                $parts[] = trim($buf);
+                $buf     = '';
+                continue;
+            }
+            $buf .= $ch;
+        }
+        if (($t = trim($buf)) !== '') $parts[] = $t;
+
+        $result = [];
+        foreach ($parts as $part) {
+            if (preg_match('/\bAS\s+[`"\']?(\w+)[`"\']?\s*$/i', $part, $pm)) {
+                $result[] = strtolower($pm[1]);                // expr AS alias
+            } elseif (preg_match('/\.(\w+)\s*$/', $part, $pm)) {
+                $result[] = strtolower($pm[1]);                // table.column
+            } elseif (preg_match('/^(\w+)\s*$/', $part, $pm)) {
+                $result[] = strtolower($pm[1]);                // bare column
+            }
+            // expressions without aliases → leave slot empty (skip)
+        }
+
+        return array_values(array_filter($result));
+    }
+
     public function reorder(Request $request)
     {
         $request->validate([
