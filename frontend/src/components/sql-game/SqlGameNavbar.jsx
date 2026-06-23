@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Terminal, Trophy, User, ChevronDown, LogOut } from 'lucide-react'
+import { ArrowLeft, Terminal, Trophy, User, ChevronDown, LogOut, Home } from 'lucide-react'
 
-export function SqlGameNavbar({ player, onLogin, onLogout, onLeaderboard }) {
+export function SqlGameNavbar({ player, onBack, onLogin, onLogout, onLeaderboard }) {
   const navigate    = useNavigate()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -23,8 +23,16 @@ export function SqlGameNavbar({ player, onLogin, onLogout, onLeaderboard }) {
         <button
           onClick={() => navigate('/')}
           className="flex items-center gap-1 text-[11px] font-mono text-sql-dim hover:text-accent transition-colors"
+          title="Halaman Utama"
         >
-          <ArrowLeft size={12} /> BACK
+          <Home size={12} />
+        </button>
+        <span className="text-border">│</span>
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1 text-[11px] font-mono text-sql-dim hover:text-accent transition-colors"
+        >
+          <ArrowLeft size={12} /> MISSIONS
         </button>
         <span className="text-border">│</span>
         <div className="flex items-center gap-1.5">

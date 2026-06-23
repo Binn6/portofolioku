@@ -36,7 +36,7 @@ export function GameShell() {
     currentMissionId, goToNextMission, goToPrevMission, isInitializingDb,
     getSelectedChapter, getSelectedSubchapter, getDbSchema,
     player, datasets,
-    setPlayer, clearPlayer, hydrateProgress, selectedDataset,
+    setPlayer, clearPlayer, hydrateProgress, selectedDataset, clearDataset,
   } = store
 
   const [showAuth, setShowAuth]               = useState(false)
@@ -84,6 +84,7 @@ export function GameShell() {
     <div className="flex flex-col h-screen bg-background text-accent overflow-hidden">
       <SqlGameNavbar
         player={player}
+        onBack={clearDataset}
         onLogin={() => setShowAuth(true)}
         onLogout={handleLogout}
         onLeaderboard={() => setShowLeaderboard(true)}
@@ -103,7 +104,7 @@ export function GameShell() {
               )}
             </div>
           )}
-          <UserCard rank={rank} />
+          <UserCard rank={rank} player={player} />
           {mission && (
             <>
               <MissionBriefing title={mission.title} briefing={mission.briefing} />

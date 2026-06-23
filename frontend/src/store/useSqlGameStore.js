@@ -61,6 +61,20 @@ export const useSqlGameStore = create((set, get) => ({
     })
   },
 
+  clearDataset: () => {
+    const { db } = get()
+    if (db) { try { db.close() } catch (_) {} }
+    set({
+      selectedDataset: null,
+      db: null,
+      currentMissionId: null,
+      lastResult: null,
+      queryText: '',
+      isInitializingDb: false,
+      solvedMissions: [],
+    })
+  },
+
   setDb: (db) => set({ db, isInitializingDb: false }),
 
   setInitializingDb: (v) => set({ isInitializingDb: v }),
