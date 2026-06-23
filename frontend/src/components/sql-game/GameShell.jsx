@@ -16,6 +16,18 @@ import { SqlGameNavbar } from './SqlGameNavbar'
 import { AuthModal } from './auth/AuthModal'
 import { LeaderboardModal } from './leaderboard/LeaderboardModal'
 
+function PanelHeader({ title }) {
+  return (
+    <div className="flex items-center justify-between px-3 py-2 border border-border border-b-0 rounded-t bg-surface flex-shrink-0">
+      <span className="text-xs font-mono text-sql-dim uppercase tracking-widest">{title}</span>
+      <div className="flex gap-1.5">
+        <div className="w-2.5 h-2.5 rounded-full bg-[#FF79C6] opacity-60" />
+        <div className="w-2.5 h-2.5 rounded-full bg-sql-primary opacity-60" />
+      </div>
+    </div>
+  )
+}
+
 export function GameShell() {
   const store = useSqlGameStore()
   const {
@@ -44,7 +56,7 @@ export function GameShell() {
   // On mount: restore session from localStorage token
   useEffect(() => {
     const token = localStorage.getItem('sql_player_token')
-    if (!token || player) return
+    if (!token) return
     sqlPlayerMe()
       .then(p => setPlayer(p, token))
       .catch(() => localStorage.removeItem('sql_player_token'))
@@ -67,16 +79,6 @@ export function GameShell() {
     try { await sqlPlayerLogout() } catch (_) {}
     clearPlayer()
   }
-
-  const PanelHeader = ({ title }) => (
-    <div className="flex items-center justify-between px-3 py-2 border border-border border-b-0 rounded-t bg-surface flex-shrink-0">
-      <span className="text-xs font-mono text-sql-dim uppercase tracking-widest">{title}</span>
-      <div className="flex gap-1.5">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#FF79C6] opacity-60" />
-        <div className="w-2.5 h-2.5 rounded-full bg-sql-primary opacity-60" />
-      </div>
-    </div>
-  )
 
   return (
     <div className="flex flex-col h-screen bg-background text-accent overflow-hidden">

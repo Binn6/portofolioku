@@ -8,12 +8,13 @@ export function SqlGameNavbar({ player, onLogin, onLogout, onLeaderboard }) {
   const dropdownRef = useRef(null)
 
   useEffect(() => {
+    if (!open) return
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  }, [open])
 
   return (
     <header className="flex items-center justify-between px-4 h-11 border-b border-border bg-surface flex-shrink-0 z-10">
