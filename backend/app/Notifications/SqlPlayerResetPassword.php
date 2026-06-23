@@ -19,14 +19,14 @@ class SqlPlayerResetPassword extends Notification
 
     public function toMail($notifiable): MailMessage
     {
-        $frontendUrl = env('FRONTEND_URL', config('app.url'));
+        $frontendUrl = config('app.frontend_url') ?? config('app.url');
         $url = $frontendUrl . '/reset-password?token=' . $this->token . '&email=' . urlencode($this->email);
 
         return (new MailMessage)
             ->subject('Reset Password - SQL Mission Control')
             ->line('Kamu menerima email ini karena ada permintaan reset password untuk akunmu.')
             ->action('Reset Password', $url)
-            ->line('Link ini kadaluarsa dalam 60 menit.')
+            ->line('Link ini kadaluarsa dalam ' . config('auth.passwords.sql_players.expire', 60) . ' menit.')
             ->line('Jika kamu tidak meminta reset password, abaikan email ini.');
     }
 }

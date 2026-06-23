@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\SqlPlayer;
-use App\Notifications\SqlPlayerResetPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -93,7 +92,6 @@ class SqlPlayerAuthController extends Controller
             'token'                 => 'required|string',
             'email'                 => 'required|email',
             'password'              => 'required|string|min:8|max:255|confirmed',
-            'password_confirmation' => 'required|string',
         ]);
 
         $status = Password::broker('sql_players')->reset(
