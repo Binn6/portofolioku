@@ -1,10 +1,10 @@
 // frontend/src/components/sql-game/leaderboard/LeaderboardModal.jsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { X, RefreshCw } from 'lucide-react'
 import { sqlGetLeaderboard } from '../../../services/api'
 import { LeaderboardTable } from './LeaderboardTable'
 
-export function LeaderboardModal({ onClose, datasets, currentDataset, player }) {
+export function LeaderboardModal({ onClose, datasets = [], currentDataset, player }) {
   const [selectedDatasetId, setSelectedDatasetId] = useState(currentDataset?.id ?? datasets[0]?.id ?? '')
   const [tab, setTab]         = useState('xp')
   const [data, setData]       = useState(null)
@@ -12,10 +12,12 @@ export function LeaderboardModal({ onClose, datasets, currentDataset, player }) 
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState(null)
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     if (!selectedDatasetId) return
     setLoading(true)
     setError(null)
+    setData(null)
+    setCallerRow(null)
     try {
       const res = await sqlGetLeaderboard(selectedDatasetId, tab)
       setData(res.data ?? [])
@@ -26,11 +28,11 @@ export function LeaderboardModal({ onClose, datasets, currentDataset, player }) 
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedDatasetId, tab])
 
   useEffect(() => {
     fetchLeaderboard()
-  }, [selectedDatasetId, tab])
+  }, [fetchLeaderboard])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
