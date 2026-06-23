@@ -16,13 +16,19 @@ import { SqlGameNavbar } from './SqlGameNavbar'
 import { AuthModal } from './auth/AuthModal'
 import { LeaderboardModal } from './leaderboard/LeaderboardModal'
 
-function PanelHeader({ title }) {
+function PanelHeader({ title, badge }) {
   return (
-    <div className="flex items-center justify-between px-3 py-2 border border-border border-b-0 rounded-t bg-surface flex-shrink-0">
-      <span className="text-xs font-mono text-sql-dim uppercase tracking-widest">{title}</span>
+    <div className="flex items-center justify-between px-3 py-2 border border-border border-b-0 rounded-t flex-shrink-0"
+      style={{ background: '#0c0c0c' }}>
+      <div className="flex items-center gap-2">
+        <div className="w-1 h-3 rounded-sm" style={{ background: '#00FF41', boxShadow: '0 0 4px #00FF41' }} />
+        <span className="text-[10px] font-mono text-sql-dim tracking-widest uppercase">{title}</span>
+        {badge && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ color: '#555', background: '#111', border: '1px solid #222' }}>{badge}</span>}
+      </div>
       <div className="flex gap-1.5">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#FF79C6] opacity-60" />
-        <div className="w-2.5 h-2.5 rounded-full bg-sql-primary opacity-60" />
+        <div className="w-2 h-2 rounded-full" style={{ background: '#FF5F57', opacity: 0.6 }} />
+        <div className="w-2 h-2 rounded-full" style={{ background: '#FEBC2E', opacity: 0.6 }} />
+        <div className="w-2 h-2 rounded-full" style={{ background: '#28C840', opacity: 0.6 }} />
       </div>
     </div>
   )
@@ -92,15 +98,16 @@ export function GameShell() {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-72 flex-shrink-0 border-r border-border flex flex-col overflow-y-auto p-4 gap-4 bg-surface">
+        <aside className="w-72 flex-shrink-0 border-r border-border flex flex-col overflow-y-auto p-4 gap-4"
+          style={{ background: '#0a0a0a' }}>
           {chapter && (
-            <div className="font-mono text-xs border-b border-border pb-3">
-              <p className="text-sql-dim uppercase tracking-widest mb-1">Modul</p>
-              <p className="font-semibold" style={{ color: chapter.color || '#00FF41' }}>
+            <div className="font-mono text-xs border-b border-border/50 pb-3">
+              <p className="text-[9px] tracking-[0.25em] text-sql-dim uppercase mb-1">Modul Aktif</p>
+              <p className="font-bold text-sm" style={{ color: chapter.color || '#00FF41', textShadow: `0 0 8px ${chapter.color || '#00FF41'}40` }}>
                 {chapter.name}
               </p>
               {subchapter && (
-                <p className="text-accent-muted mt-0.5">{subchapter.name}</p>
+                <p className="text-accent-muted text-xs mt-0.5 opacity-70">{subchapter.name}</p>
               )}
             </div>
           )}

@@ -93,27 +93,22 @@ class AdminSqlMissionController extends Controller
             $skipped = 0;
 
             foreach ($missions as $mission) {
-                // Normalise to plain PHP arrays regardless of BSON driver format
-                $objectives = array_map(
-                    fn($o) => is_array($o) ? $o : (array) $o,
-                    $mission->objectives ?? []
-                );
-                if (empty($objectives)) continue;
-
-                $hasEmpty = collect($objectives)->some(fn($o) => empty($o['col'] ?? ''));
-                if (!$hasEmpty) continue;
-
                 $cols = $this->parseSelectColumns($mission->solution_query ?? '');
                 if (empty($cols)) { $skipped++; continue; }
 
-                $colIdx = 0;
-                $updated = array_map(function (array $obj) use (&$colIdx, $cols) {
-                    if (empty($obj['col'] ?? '')) {
-                        $obj['col'] = $cols[$colIdx] ?? '';
-                    }
-                    $colIdx++;
-                    return $obj;
-                }, $objectives);
+                // Preserve existing descriptions keyed by col name
+                $existingDescs = [];
+                foreach ($mission->objectives ?? [] as $o) {
+                    $o   = is_array($o) ? $o : (array) $o;
+                    $col = strtolower(trim($o['col'] ?? ''));
+                    if ($col !== '') $existingDescs[$col] = $o['desc'] ?? '';
+                }
+
+                // Rebuild objectives 1-to-1 from parsed columns
+                $updated = array_map(fn($col) => [
+                    'col'  => $col,
+                    'desc' => $existingDescs[$col] ?? "Kolom {$col} ada dalam hasil query",
+                ], $cols);
 
                 $mission->objectives = $updated;
                 $mission->save();
