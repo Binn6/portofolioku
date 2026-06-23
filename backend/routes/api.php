@@ -132,4 +132,10 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::delete('/sql-game/missions/{id}',       [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'destroy']);
     Route::post('/sql-game/missions/reorder',      [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'reorder']);
     Route::post('/sql-game/missions/fix-objectives', [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'fixObjectives']);
+
+    // TEMPORARY — remove after seeding
+    Route::post('/run-seeder/sql-game/mZ8kQ3xP7nR2vT5', function () {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\SqlGameSeeder']);
+        return response()->json(['ok' => true, 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+    });
 });
