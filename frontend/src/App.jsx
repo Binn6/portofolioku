@@ -17,6 +17,7 @@ import AdminChat from './pages/admin/Chat'
 import More from './pages/admin/More'
 import SqlGame from './pages/admin/SqlGame'
 import SqlMissionControl from './pages/SqlMissionControl'
+import ResetPassword from './pages/ResetPassword'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<Portfolio />} />
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/sql-mission-control" element={<SqlMissionControl />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/:section" element={<Portfolio />} />
           <Route path="/binn/login" element={<Login />} />
           <Route path="/binn" element={<Navigate to="/binn/dashboard" replace />} />
