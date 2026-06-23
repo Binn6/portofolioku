@@ -14,9 +14,9 @@ class SqlPlayerAuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'username' => ['required', 'string', 'max:30', Rule::unique(SqlPlayer::class, 'username')],
-            'email'    => ['required', 'email',           Rule::unique(SqlPlayer::class, 'email')],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'username' => ['required', 'string', 'min:3', 'max:30', Rule::unique(SqlPlayer::class, 'username')],
+            'email'    => ['required', 'email',            Rule::unique(SqlPlayer::class, 'email')],
+            'password' => ['required', 'string', 'min:8', 'max:255', 'confirmed'],
         ]);
 
         $player = SqlPlayer::create($data);
