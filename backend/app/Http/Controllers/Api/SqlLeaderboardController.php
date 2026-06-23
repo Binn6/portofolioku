@@ -71,9 +71,13 @@ class SqlLeaderboardController extends Controller
             }
         }
 
-        // Load player usernames
-        $playerIds = array_column($rows, 'player_id');
-        $players   = SqlPlayer::whereIn('_id', $playerIds)
+        // Load player usernames — cast to ObjectId because _id is stored as BSON ObjectId
+        $rawIds    = array_column($rows, 'player_id');
+        $objectIds = array_values(array_filter(array_map(function ($id) {
+            try { return new \MongoDB\BSON\ObjectId((string) $id); } catch (\Throwable) { return null; }
+        }, $rawIds)));
+
+        $players = SqlPlayer::whereIn('_id', $objectIds)
             ->get()
             ->keyBy(fn($p) => (string) $p->_id);
 
