@@ -82,7 +82,7 @@ export function LeaderboardTable({ rows, callerRow, type, loggedIn }) {
       </table>
       {!loggedIn && (
         <p className="text-center text-xs text-sql-dim font-mono py-4 border-t border-border">
-          Login untuk melihat posisi kamu di leaderboard
+          Login untuk lihat posisi kamu
         </p>
       )}
     </div>
