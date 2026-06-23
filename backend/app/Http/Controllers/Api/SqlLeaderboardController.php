@@ -81,7 +81,7 @@ class SqlLeaderboardController extends Controller
         $result = [];
 
         foreach ($top20 as $rank => $row) {
-            $player = $players[$row['player_id']] ?? null;
+            $player = $players[(string) $row['player_id']] ?? null;
             $item   = [
                 'rank'         => $rank + 1,
                 'username'     => $player?->username ?? '???',
@@ -99,7 +99,7 @@ class SqlLeaderboardController extends Controller
             $callerIdx = array_search($callerId, array_column($rows, 'player_id'));
             if ($callerIdx !== false) {
                 $row    = $rows[$callerIdx];
-                $player = $players[$callerId] ?? null;
+                $player = $players[(string) $callerId] ?? null;
                 $item   = [
                     'rank'         => $callerIdx + 1,
                     'username'     => $player?->username ?? '???',
