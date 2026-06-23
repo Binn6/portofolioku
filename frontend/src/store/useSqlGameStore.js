@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { parseSchemaSql } from '../utils/parseSchemaSql'
+import { sqlSyncProgress } from '../services/api'
 
 const RANK_PROGRESSION = [
   'Script Kiddie',
@@ -26,6 +27,14 @@ export const useSqlGameStore = create((set, get) => ({
   isLoading: true,
   isInitializingDb: false,
 
+  // Player auth
+  player: null,
+  playerToken: typeof window !== 'undefined' ? (localStorage.getItem('sql_player_token') ?? null) : null,
+
+  // Mission timing
+  missionStartTimes: {},
+  missionTimes: {},
+
   // Actions
   setApiData: (datasets, missions, chapters = [], subchapters = []) =>
     set({ datasets, missions, chapters, subchapters, isLoading: false }),
@@ -47,6 +56,8 @@ export const useSqlGameStore = create((set, get) => ({
       rank: RANK_PROGRESSION[0],
       lastResult: null,
       queryText: first?.starter_sql ?? '-- Tulis query SQL-mu di sini...\n\nSELECT ',
+      missionStartTimes: first ? { [first.id]: Date.now() } : {},
+      missionTimes: {},
     })
   },
 
@@ -88,12 +99,12 @@ export const useSqlGameStore = create((set, get) => ({
     const { solvedMissions, missions } = get()
     if (solvedMissions.includes(missionId)) return
 
-    const solved = [...solvedMissions, missionId]
-    const mission = missions.find(m => m.id === missionId)
+    get().recordMissionSolve(missionId)
 
+    const solved  = [...solvedMissions, missionId]
+    const mission = missions.find(m => m.id === missionId)
     let rank = get().rank
     if (mission?.rank_unlock) rank = mission.rank_unlock
-
     set({ solvedMissions: solved, rank })
   },
 
@@ -108,6 +119,9 @@ export const useSqlGameStore = create((set, get) => ({
         lastResult: null,
         queryText: next.starter_sql ?? '-- Tulis query SQL-mu di sini...\n\nSELECT ',
       })
+      set(state => ({
+        missionStartTimes: { ...state.missionStartTimes, [next.id]: Date.now() },
+      }))
     }
   },
 
@@ -122,6 +136,67 @@ export const useSqlGameStore = create((set, get) => ({
         lastResult: null,
         queryText: prev.starter_sql ?? '-- Tulis query SQL-mu di sini...\n\nSELECT ',
       })
+      set(state => ({
+        missionStartTimes: { ...state.missionStartTimes, [prev.id]: Date.now() },
+      }))
     }
+  },
+
+  setPlayer: (player, token) => {
+    if (token) localStorage.setItem('sql_player_token', token)
+    else localStorage.removeItem('sql_player_token')
+    set({ player, playerToken: token })
+  },
+
+  clearPlayer: () => {
+    localStorage.removeItem('sql_player_token')
+    set({ player: null, playerToken: null })
+  },
+
+  recordMissionStart: (missionId) => {
+    set(state => ({
+      missionStartTimes: { ...state.missionStartTimes, [missionId]: Date.now() },
+    }))
+  },
+
+  recordMissionSolve: (missionId) => {
+    const { missionStartTimes, player, selectedDataset } = get()
+    const startTime = missionStartTimes[missionId]
+    const seconds   = startTime ? Math.round((Date.now() - startTime) / 1000) : 0
+
+    set(state => ({
+      missionTimes: { ...state.missionTimes, [missionId]: seconds },
+    }))
+
+    if (player && selectedDataset) {
+      sqlSyncProgress({
+        dataset_id: selectedDataset.id,
+        mission_id: missionId,
+        seconds,
+      }).catch(() => {})  // silent fail — progress already in local state
+    }
+  },
+
+  hydrateProgress: (solvedMissions, missionTimes) => {
+    const { missions, selectedDataset } = get()
+    const currentSolved = get().solvedMissions
+    const currentTimes  = get().missionTimes
+
+    const merged = [...new Set([...currentSolved, ...solvedMissions])]
+    const times  = { ...missionTimes, ...currentTimes } // session times take precedence
+
+    // Recompute rank from merged solved list
+    let rank = RANK_PROGRESSION[0]
+    if (selectedDataset) {
+      const datasetMissions = missions
+        .filter(m => m.dataset_id === selectedDataset.id)
+        .sort((a, b) => a.stage_order - b.stage_order)
+      for (const mId of merged) {
+        const m = datasetMissions.find(m => m.id === mId)
+        if (m?.rank_unlock) rank = m.rank_unlock
+      }
+    }
+
+    set({ solvedMissions: merged, missionTimes: times, rank })
   },
 }))
