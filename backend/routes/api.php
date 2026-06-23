@@ -17,6 +17,9 @@ use App\Http\Controllers\Api\Admin\AdminMessageController;
 use App\Http\Controllers\Api\Admin\AdminProfileController;
 use App\Http\Controllers\Api\Admin\AdminProjectController;
 use App\Http\Controllers\Api\Admin\AdminSkillController;
+use App\Http\Controllers\Api\SqlPlayerAuthController;
+use App\Http\Controllers\Api\SqlProgressController;
+use App\Http\Controllers\Api\SqlLeaderboardController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -32,6 +35,27 @@ Route::get('/chat/{sessionId}', [ChatController::class, 'messages'])->middleware
 
 // ── SQL GAME — Public ───────────────────────────────────────
 Route::get('/sql-game/config', [\App\Http\Controllers\Api\SqlGameController::class, 'config']);
+
+// ── SQL GAME — Player Auth ──────────────────────────────────
+Route::prefix('sql-game/auth')->group(function () {
+    Route::post('register',        [SqlPlayerAuthController::class, 'register'])->middleware('throttle:5,1');
+    Route::post('login',           [SqlPlayerAuthController::class, 'login'])->middleware('throttle:10,1');
+    Route::post('forgot-password', [SqlPlayerAuthController::class, 'forgotPassword'])->middleware('throttle:3,1');
+    Route::post('reset-password',  [SqlPlayerAuthController::class, 'resetPassword']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('logout', [SqlPlayerAuthController::class, 'logout']);
+        Route::get('me',      [SqlPlayerAuthController::class, 'me']);
+    });
+});
+
+// ── SQL GAME — Progress (player auth required) ──────────────
+Route::middleware('auth:sanctum')->prefix('sql-game/progress')->group(function () {
+    Route::get('/',     [SqlProgressController::class, 'show']);
+    Route::post('sync', [SqlProgressController::class, 'sync']);
+});
+
+// ── SQL GAME — Leaderboard (public) ────────────────────────
+Route::get('/sql-game/leaderboard', [SqlLeaderboardController::class, 'index']);
 
 // Auth
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
