@@ -136,6 +136,8 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
 
 // TEMPORARY — no auth, protected by secret in URL. Remove after seeding.
 Route::post('/internal-seed/mZ8kQ3xP7nR2vT5wY6', function () {
-    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\SqlGameSeeder', '--force' => true]);
-    return response()->json(['ok' => true, 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+    $seeder = new \Database\Seeders\SqlGameSeeder();
+    $seeder->setContainer(app());
+    $seeder->run();
+    return response()->json(['ok' => true]);
 });
