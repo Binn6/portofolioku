@@ -163,4 +163,45 @@ export const adminReorderSqlMissions = (order) =>
 export const adminFixSqlObjectives = () =>
   api.post('/admin/sql-game/missions/fix-objectives').then(r => r.data)
 
+// ─── SQL GAME — Player Auth ───────────────────────────────────
+const sqlPlayerHeaders = () => {
+  const token = localStorage.getItem('sql_player_token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+export const sqlPlayerRegister = (data) =>
+  api.post('/sql-game/auth/register', data).then(r => r.data)
+
+export const sqlPlayerLogin = (data) =>
+  api.post('/sql-game/auth/login', data).then(r => r.data)
+
+export const sqlPlayerLogout = () =>
+  api.post('/sql-game/auth/logout', {}, { headers: sqlPlayerHeaders() }).then(r => r.data)
+
+export const sqlPlayerMe = () =>
+  api.get('/sql-game/auth/me', { headers: sqlPlayerHeaders() }).then(r => r.data)
+
+export const sqlPlayerForgotPassword = (email) =>
+  api.post('/sql-game/auth/forgot-password', { email }).then(r => r.data)
+
+export const sqlPlayerResetPassword = (data) =>
+  api.post('/sql-game/auth/reset-password', data).then(r => r.data)
+
+// ─── SQL GAME — Progress ──────────────────────────────────────
+export const sqlGetProgress = (datasetId) =>
+  api.get('/sql-game/progress', {
+    params: { dataset_id: datasetId },
+    headers: sqlPlayerHeaders(),
+  }).then(r => r.data)
+
+export const sqlSyncProgress = (data) =>
+  api.post('/sql-game/progress/sync', data, { headers: sqlPlayerHeaders() }).then(r => r.data)
+
+// ─── SQL GAME — Leaderboard ───────────────────────────────────
+export const sqlGetLeaderboard = (datasetId, type) =>
+  api.get('/sql-game/leaderboard', {
+    params: { dataset_id: datasetId, type },
+    headers: sqlPlayerHeaders(),
+  }).then(r => r.data)
+
 export default api
