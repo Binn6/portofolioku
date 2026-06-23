@@ -71,9 +71,15 @@ class SqlPlayerAuthController extends Controller
         $request->validate(['email' => 'required|email']);
 
         // Check mail is configured
-        $mailer = config('mail.default', 'log');
-        $host   = config("mail.mailers.{$mailer}.host", null);
-        if (!$host || $host === 'localhost' || $host === '127.0.0.1') {
+        $mailer    = config('mail.default', 'log');
+        $transport = config("mail.mailers.{$mailer}.transport", $mailer);
+        $unconfigured = match ($transport) {
+            'log', 'array' => true,
+            'brevo'        => empty(config('services.brevo.key')),
+            'smtp'         => in_array(config("mail.mailers.{$mailer}.host", ''), ['', 'localhost', '127.0.0.1']),
+            default        => false,
+        };
+        if ($unconfigured) {
             return response()->json(['message' => 'Layanan email belum dikonfigurasi'], 503);
         }
 
