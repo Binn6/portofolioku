@@ -39,10 +39,16 @@ export default function MissionForm({ form, onChange, datasets }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="block text-xs text-accent-muted mb-1">Stage Order *</label>
           <input type="number" min="1" value={form.stage_order} onChange={set('stage_order')}
+            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-accent text-sm outline-none focus:border-accent" />
+        </div>
+        <div>
+          <label className="block text-xs text-accent-muted mb-1">Difficulty (1–5)</label>
+          <input type="number" min="1" max="5" value={form.difficulty ?? ''} onChange={set('difficulty')}
+            placeholder="kosong = auto"
             className="w-full bg-background border border-border rounded-lg px-3 py-2 text-accent text-sm outline-none focus:border-accent" />
         </div>
         <div>

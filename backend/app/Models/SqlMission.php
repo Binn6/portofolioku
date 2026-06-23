@@ -11,7 +11,7 @@ class SqlMission extends Model
     protected $fillable = [
         'dataset_id', 'stage_order', 'title', 'briefing',
         'tables', 'objectives', 'ordering_hint', 'ordered',
-        'starter_sql', 'solution_query', 'rank_unlock', 'is_active',
+        'starter_sql', 'solution_query', 'rank_unlock', 'is_active', 'difficulty',
     ];
 
     protected $casts = [
@@ -20,5 +20,6 @@ class SqlMission extends Model
         'ordered'     => 'boolean',
         'is_active'   => 'boolean',
         'stage_order' => 'integer',
+        'difficulty'  => 'integer',
     ];
 }

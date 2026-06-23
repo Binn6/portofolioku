@@ -40,6 +40,7 @@ class AdminSqlMissionController extends Controller
             'solution_query'=> 'required|string',
             'rank_unlock'   => 'nullable|string|max:100',
             'is_active'     => 'boolean',
+            'difficulty'    => 'nullable|integer|min:1|max:5',
         ]);
 
         $mission = SqlMission::create($data);
@@ -70,6 +71,7 @@ class AdminSqlMissionController extends Controller
             'solution_query'=> 'sometimes|string',
             'rank_unlock'   => 'nullable|string|max:100',
             'is_active'     => 'boolean',
+            'difficulty'    => 'nullable|integer|min:1|max:5',
         ]);
 
         $mission->update($data);
