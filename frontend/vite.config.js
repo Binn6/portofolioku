@@ -16,6 +16,6 @@ export default defineConfig({
     globals: true,
   },
   optimizeDeps: {
-    exclude: ['sql.js'],
+    include: ['sql.js'],
   },
 })
