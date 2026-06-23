@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'sql_player' => [
+            'driver'   => 'session',
+            'provider' => 'sql_players',
+        ],
     ],
 
     /*
@@ -63,6 +68,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        'sql_players' => [
+            'driver' => 'eloquent',
+            'model'  => App\Models\SqlPlayer::class,
         ],
 
         // 'users' => [
