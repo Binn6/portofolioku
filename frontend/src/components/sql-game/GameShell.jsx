@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useSqlGameStore } from '../../store/useSqlGameStore'
 import { useSqlGame } from '../../hooks/useSqlGame'
+import { sqlPlayerMe, sqlPlayerLogout, sqlGetProgress } from '../../services/api'
 import { ProgressBar } from './ProgressBar'
 import { UserCard } from './sidebar/UserCard'
 import { MissionBriefing } from './sidebar/MissionBriefing'
@@ -12,30 +13,60 @@ import { TerminalOutput } from './output/TerminalOutput'
 import { DeployHint } from './output/DeployHint'
 import { StageFooter } from './StageFooter'
 import { SqlGameNavbar } from './SqlGameNavbar'
+import { AuthModal } from './auth/AuthModal'
+import { LeaderboardModal } from './leaderboard/LeaderboardModal'
 
 export function GameShell() {
+  const store = useSqlGameStore()
   const {
     rank, queryText, setQueryText, lastResult,
     solvedMissions, getDatasetMissions, getCurrentMission,
     currentMissionId, goToNextMission, goToPrevMission, isInitializingDb,
     getSelectedChapter, getSelectedSubchapter, getDbSchema,
-  } = useSqlGameStore()
+    player, datasets,
+    setPlayer, clearPlayer, hydrateProgress, selectedDataset,
+  } = store
 
-  const chapter = getSelectedChapter()
+  const [showAuth, setShowAuth]               = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+
+  const chapter    = getSelectedChapter()
   const subchapter = getSelectedSubchapter()
-
-  // Memoize schema so SqlEditor doesn't recompute schemaMap on every render
-  const schema = useMemo(() => getDbSchema(), [getDbSchema])
-
+  const schema     = useMemo(() => getDbSchema(), [getDbSchema])
   const { handleRun, handleDeploy } = useSqlGame()
-
-  const mission = getCurrentMission()
+  const mission    = getCurrentMission()
   const allMissions = getDatasetMissions()
-  const missionIdx = allMissions.findIndex(m => m.id === currentMissionId)
+  const missionIdx  = allMissions.findIndex(m => m.id === currentMissionId)
   const canPrev = missionIdx > 0
   const canNext = missionIdx < allMissions.length - 1 && solvedMissions.includes(currentMissionId)
-
   const checkedCols = lastResult?.deployResult?.checkedCols ?? {}
+
+  // On mount: restore session from localStorage token
+  useEffect(() => {
+    const token = localStorage.getItem('sql_player_token')
+    if (!token || player) return
+    sqlPlayerMe()
+      .then(p => setPlayer(p, token))
+      .catch(() => localStorage.removeItem('sql_player_token'))
+  }, [])
+
+  const handleLoginSuccess = async (p, token) => {
+    setPlayer(p, token)
+    setShowAuth(false)
+    if (selectedDataset) {
+      try {
+        const progress = await sqlGetProgress(selectedDataset.id)
+        if (progress) {
+          hydrateProgress(progress.solved_missions ?? [], progress.mission_times ?? {})
+        }
+      } catch (_) {}
+    }
+  }
+
+  const handleLogout = async () => {
+    try { await sqlPlayerLogout() } catch (_) {}
+    clearPlayer()
+  }
 
   const PanelHeader = ({ title }) => (
     <div className="flex items-center justify-between px-3 py-2 border border-border border-b-0 rounded-t bg-surface flex-shrink-0">
@@ -49,7 +80,12 @@ export function GameShell() {
 
   return (
     <div className="flex flex-col h-screen bg-background text-accent overflow-hidden">
-      <SqlGameNavbar />
+      <SqlGameNavbar
+        player={player}
+        onLogin={() => setShowAuth(true)}
+        onLogout={handleLogout}
+        onLeaderboard={() => setShowLeaderboard(true)}
+      />
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
@@ -80,7 +116,6 @@ export function GameShell() {
           <ProgressBar solved={solvedMissions.length} total={allMissions.length} />
 
           <div className="flex-1 flex flex-col min-h-0 p-4 gap-3">
-            {/* Editor section */}
             <div className="flex flex-col flex-shrink-0" style={{ height: '40%' }}>
               <PanelHeader title="SQL COMMAND LINE" />
               <SqlEditor
@@ -100,7 +135,6 @@ export function GameShell() {
 
             <DeployHint deployResult={lastResult?.deployResult} />
 
-            {/* Output section */}
             <div className="flex-1 min-h-0">
               <TerminalOutput result={lastResult} />
             </div>
@@ -114,6 +148,22 @@ export function GameShell() {
         canPrev={canPrev}
         canNext={canNext}
       />
+
+      {showAuth && (
+        <AuthModal
+          onClose={() => setShowAuth(false)}
+          onSuccess={handleLoginSuccess}
+        />
+      )}
+
+      {showLeaderboard && (
+        <LeaderboardModal
+          onClose={() => setShowLeaderboard(false)}
+          datasets={datasets}
+          currentDataset={selectedDataset}
+          player={player}
+        />
+      )}
     </div>
   )
 }
