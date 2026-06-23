@@ -134,10 +134,3 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::post('/sql-game/missions/fix-objectives', [\App\Http\Controllers\Api\Admin\AdminSqlMissionController::class, 'fixObjectives']);
 });
 
-// TEMPORARY — no auth, protected by secret in URL. Remove after seeding.
-Route::post('/internal-seed/mZ8kQ3xP7nR2vT5wY6', function () {
-    $seeder = new \Database\Seeders\SqlGameSeeder();
-    $seeder->setContainer(app());
-    $seeder->run();
-    return response()->json(['ok' => true]);
-});
