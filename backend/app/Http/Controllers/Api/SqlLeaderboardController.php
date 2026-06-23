@@ -47,7 +47,8 @@ class SqlLeaderboardController extends Controller
 
                 $xp = $this->computeXp($solved, $times, $missionsMap);
                 $rows[] = [
-                    'player_id'    => $progress->player_id,
+                    'player_id'    => (string) $progress->player_id,
+                    'username'     => $progress->username ?? '???',
                     'xp'           => $xp,
                     'solved_count' => count($solved),
                 ];
@@ -64,29 +65,21 @@ class SqlLeaderboardController extends Controller
             $rows = [];
             foreach ($progresses as $progress) {
                 $rows[] = [
-                    'player_id'     => $progress->player_id,
+                    'player_id'     => (string) $progress->player_id,
+                    'username'      => $progress->username ?? '???',
                     'total_seconds' => $progress->total_seconds ?? 0,
                     'solved_count'  => count($progress->solved_missions ?? []),
                 ];
             }
         }
 
-        // Load player usernames — find() handles string → ObjectId cast reliably
-        $uniqueIds = array_unique(array_map('strval', array_column($rows, 'player_id')));
-        $players   = collect();
-        foreach ($uniqueIds as $id) {
-            $p = SqlPlayer::find($id);
-            if ($p) $players[(string) $p->_id] = $p;
-        }
-
         $top20  = array_slice($rows, 0, 20);
         $result = [];
 
         foreach ($top20 as $rank => $row) {
-            $player = $players[(string) $row['player_id']] ?? null;
-            $item   = [
+            $item = [
                 'rank'         => $rank + 1,
-                'username'     => $player?->username ?? '???',
+                'username'     => $row['username'],
                 'solved_count' => $row['solved_count'],
                 'is_me'        => $callerId !== null && $row['player_id'] === $callerId,
             ];
@@ -100,11 +93,10 @@ class SqlLeaderboardController extends Controller
         if ($callerId && !collect($result)->contains('is_me', true)) {
             $callerIdx = array_search($callerId, array_column($rows, 'player_id'));
             if ($callerIdx !== false) {
-                $row    = $rows[$callerIdx];
-                $player = $players[(string) $callerId] ?? null;
-                $item   = [
+                $row  = $rows[$callerIdx];
+                $item = [
                     'rank'         => $callerIdx + 1,
-                    'username'     => $player?->username ?? '???',
+                    'username'     => $row['username'],
                     'solved_count' => $row['solved_count'],
                     'is_me'        => true,
                 ];

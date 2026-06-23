@@ -10,7 +10,7 @@ class SqlGameProgress extends Model
     protected $collection = 'sql_game_progress';
 
     protected $fillable = [
-        'player_id', 'dataset_id', 'solved_missions',
+        'player_id', 'username', 'dataset_id', 'solved_missions',
         'mission_times', 'started_at', 'completed_at', 'total_seconds',
     ];
 

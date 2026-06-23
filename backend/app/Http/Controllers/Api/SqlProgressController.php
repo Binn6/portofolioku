@@ -71,6 +71,8 @@ class SqlProgressController extends Controller
         $allSolved = count($activeMissionIds) > 0
             && count(array_diff($activeMissionIds, $solved)) === 0;
 
+        $progress->player_id       = $playerId;
+        $progress->username        = $player->username;
         $progress->solved_missions = $solved;
         $progress->mission_times   = $times;
         $progress->total_seconds   = $totalSeconds;
