@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\SqlPlayer;
+use App\Notifications\SqlPlayerResetPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -63,6 +65,48 @@ class SqlPlayerAuthController extends Controller
     public function me(Request $request)
     {
         return response()->json($this->playerShape($request->user()));
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Check mail is configured
+        $mailer = config('mail.default', 'log');
+        $host   = config("mail.mailers.{$mailer}.host", null);
+        if (!$host || $host === 'localhost' || $host === '127.0.0.1') {
+            return response()->json(['message' => 'Layanan email belum dikonfigurasi'], 503);
+        }
+
+        $status = Password::broker('sql_players')->sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => 'Link reset password telah dikirim ke email kamu.'])
+            : response()->json(['message' => 'Email tidak ditemukan.'], 422);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'                 => 'required|string',
+            'email'                 => 'required|email',
+            'password'              => 'required|string|min:8|max:255|confirmed',
+            'password_confirmation' => 'required|string',
+        ]);
+
+        $status = Password::broker('sql_players')->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (SqlPlayer $player, string $password) {
+                $player->forceFill(['password' => $password])->save();
+                $player->tokens()->delete();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => 'Password berhasil direset. Silakan login.'])
+            : response()->json(['message' => __($status)], 422);
     }
 
     private function playerShape(SqlPlayer $player): array

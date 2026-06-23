@@ -107,6 +107,14 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        'sql_players' => [
+            'provider'   => 'sql_players',
+            'table'      => 'sql_player_password_resets',
+            'expire'     => 60,
+            'throttle'   => 60,
+            'connection' => 'mongodb',
+        ],
     ],
 
     /*

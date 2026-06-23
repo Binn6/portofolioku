@@ -21,4 +21,9 @@ class SqlPlayer extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\SqlPlayerResetPassword($token, $this->email));
+    }
 }
