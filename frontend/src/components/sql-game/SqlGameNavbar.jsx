@@ -50,7 +50,7 @@ export function SqlGameNavbar({ player, onBack, onLogin, onLogout, onLeaderboard
           className="flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 border border-border rounded
             text-sql-dim hover:text-accent hover:border-accent transition-colors"
         >
-          <Trophy size={11} /> LEADERBOARD
+          <Trophy size={11} /> <span className="hidden sm:inline">LEADERBOARD</span>
         </button>
 
         {player ? (
