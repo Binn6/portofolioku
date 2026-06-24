@@ -98,27 +98,36 @@ export function GameShell() {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-72 flex-shrink-0 border-r border-border flex flex-col overflow-y-auto p-4 gap-4"
+        <aside className="w-72 flex-shrink-0 border-r border-border flex flex-col min-h-0"
           style={{ background: '#0a0a0a' }}>
-          {chapter && (
-            <div className="font-mono text-xs border-b border-border/50 pb-3">
-              <p className="text-[9px] tracking-[0.25em] text-sql-dim uppercase mb-1">Modul Aktif</p>
-              <p className="font-bold text-sm" style={{ color: chapter.color || '#00FF41', textShadow: `0 0 8px ${chapter.color || '#00FF41'}40` }}>
-                {chapter.name}
-              </p>
-              {subchapter && (
-                <p className="text-accent-muted text-xs mt-0.5 opacity-70">{subchapter.name}</p>
-              )}
-            </div>
-          )}
-          <UserCard rank={rank} player={player} />
-          {mission && (
-            <>
-              <MissionBriefing title={mission.title} briefing={mission.briefing} />
-              <ObjectivesList objectives={mission.objectives || []} checkedCols={checkedCols} />
-            </>
-          )}
-          {schema.length > 0 && <SchemaPanel schema={schema} />}
+
+          {/* ── Sticky top: chapter label + player card ── */}
+          <div className="flex-shrink-0 px-4 pt-4 pb-3 space-y-3 border-b border-border/30">
+            {chapter && (
+              <div className="font-mono text-xs">
+                <p className="text-[9px] tracking-[0.25em] text-sql-dim uppercase mb-1">Modul Aktif</p>
+                <p className="font-bold text-sm"
+                  style={{ color: chapter.color || '#00FF41', textShadow: `0 0 8px ${chapter.color || '#00FF41'}40` }}>
+                  {chapter.name}
+                </p>
+                {subchapter && (
+                  <p className="text-accent-muted text-xs mt-0.5 opacity-70">{subchapter.name}</p>
+                )}
+              </div>
+            )}
+            <UserCard rank={rank} player={player} />
+          </div>
+
+          {/* ── Scrollable body: mission intel + schema ── */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 min-h-0">
+            {mission && (
+              <>
+                <MissionBriefing title={mission.title} briefing={mission.briefing} />
+                <ObjectivesList objectives={mission.objectives || []} checkedCols={checkedCols} />
+              </>
+            )}
+            {schema.length > 0 && <SchemaPanel schema={schema} />}
+          </div>
         </aside>
 
         {/* Main panel */}

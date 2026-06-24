@@ -27,3 +27,30 @@ input, textarea, select {
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* ── Custom scrollbars — tactical terminal aesthetic ─────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 65, 0.12);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 65, 0.45);
+  box-shadow: 0 0 6px rgba(0, 255, 65, 0.3);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 65, 0.12) transparent;
+}
