@@ -15,7 +15,7 @@ export default function SqlMissionControl() {
 
   useDatabase()
 
-  useEffect(() => {
+  const loadConfig = () => {
     getSqlGameConfig()
       .then(({ datasets, missions, chapters = [], subchapters = [] }) => {
         setApiData(datasets, missions, chapters, subchapters)
@@ -27,7 +27,9 @@ export default function SqlMissionControl() {
         console.error('Failed to load sql game config:', err)
         setApiData([], [], [], [])
       })
-  }, [])
+  }
+
+  useEffect(() => { loadConfig() }, [])
 
   if (isLoading) {
     return (
@@ -56,6 +58,7 @@ export default function SqlMissionControl() {
           subchapters={subchapters}
           datasets={datasets}
           onSelect={selectDataset}
+          onRefresh={loadConfig}
         />
       )
     }

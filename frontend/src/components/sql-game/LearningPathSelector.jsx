@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Home, Terminal, ChevronRight, Lock, Zap } from 'lucide-react'
+import { Home, Terminal, ChevronRight, Lock, Zap, RefreshCw } from 'lucide-react'
 import { useSqlGameStore } from '../../store/useSqlGameStore'
 
 const RANK_TIERS = [
@@ -21,9 +22,17 @@ const RANK_TIERS = [
   { name: 'Index Wizard',    color: '#FF0080' },
 ]
 
-export function LearningPathSelector({ chapters, subchapters, datasets, onSelect }) {
-  const navigate = useNavigate()
+export function LearningPathSelector({ chapters, subchapters, datasets, onSelect, onRefresh }) {
+  const navigate    = useNavigate()
+  const [refreshing, setRefreshing] = useState(false)
   const { player, rank } = useSqlGameStore()
+
+  const handleRefresh = async () => {
+    if (!onRefresh || refreshing) return
+    setRefreshing(true)
+    await onRefresh()
+    setTimeout(() => setRefreshing(false), 800)
+  }
 
   const currentTierIdx = RANK_TIERS.findIndex(r => r.name === rank)
   const currentTier    = RANK_TIERS[currentTierIdx] ?? RANK_TIERS[0]
@@ -59,16 +68,26 @@ export function LearningPathSelector({ chapters, subchapters, datasets, onSelect
             </span>
           </div>
         </div>
-        <div className="text-[10px] font-mono text-sql-dim hidden md:block">
-          {player ? (
-            <span>
-              <span className="text-sql-primary">{player.username}</span>
-              {' · '}
-              <span style={{ color: currentTier.color }}>{rank}</span>
-            </span>
-          ) : (
-            <span>GUEST · <span className="text-sql-dim">Login untuk simpan progress</span></span>
-          )}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="text-[10px] font-mono text-sql-dim hover:text-accent transition-colors disabled:opacity-40"
+            title="Refresh data misi"
+          >
+            <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
+          </button>
+          <div className="text-[10px] font-mono text-sql-dim hidden md:block">
+            {player ? (
+              <span>
+                <span className="text-sql-primary">{player.username}</span>
+                {' · '}
+                <span style={{ color: currentTier.color }}>{rank}</span>
+              </span>
+            ) : (
+              <span>GUEST · <span className="text-sql-dim">Login untuk simpan progress</span></span>
+            )}
+          </div>
         </div>
       </header>
 

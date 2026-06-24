@@ -89,11 +89,26 @@ class AdminSqlMissionController extends Controller
     {
         try {
             $missions = SqlMission::all();
+
+            // Pre-load all datasets keyed by _id for schema lookups
+            $datasets = \App\Models\SqlDataset::all()
+                ->mapWithKeys(fn($d) => [(string) $d->_id => $d]);
+
             $fixed = 0;
             $skipped = 0;
 
             foreach ($missions as $mission) {
                 $cols = $this->parseSelectColumns($mission->solution_query ?? '');
+
+                // SELECT * or un-parsable → fall back to schema-derived columns
+                if (empty($cols)) {
+                    $dataset = $datasets->get((string) $mission->dataset_id);
+                    if ($dataset) {
+                        $tables = is_array($mission->tables) ? $mission->tables : [];
+                        $cols   = $this->colsFromSchema($dataset->schema_sql ?? '', $tables);
+                    }
+                }
+
                 if (empty($cols)) { $skipped++; continue; }
 
                 // Preserve existing descriptions keyed by col name
@@ -119,6 +134,47 @@ class AdminSqlMissionController extends Controller
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Derive column names from CREATE TABLE statements in schema SQL.
+     * If $tables is provided, only columns from those tables are returned.
+     */
+    private function colsFromSchema(string $schemaSql, array $tables = []): array
+    {
+        $result = [];
+
+        // Match all CREATE TABLE blocks
+        preg_match_all(
+            '/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"\[]?(\w+)[`"\]]?\s*\((.+?)\)\s*;/is',
+            $schemaSql,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        foreach ($matches as $match) {
+            $tableName = strtolower($match[1]);
+
+            // If specific tables requested, skip others
+            if (!empty($tables) && !in_array($tableName, array_map('strtolower', $tables))) {
+                continue;
+            }
+
+            $body = $match[2];
+
+            foreach (preg_split('/,\s*\n/', $body) as $line) {
+                $line = trim($line);
+                // Skip table-level constraints
+                if (preg_match('/^(?:PRIMARY|FOREIGN|UNIQUE|CHECK|CONSTRAINT)\b/i', $line)) continue;
+                // Extract column name (first identifier on the line)
+                if (preg_match('/^[`"\[]?([a-zA-Z_]\w*)[`"\]]?\s+\w/i', $line, $cm)) {
+                    $col = strtolower($cm[1]);
+                    if (!in_array($col, $result)) $result[] = $col;
+                }
+            }
+        }
+
+        return $result;
     }
 
     private function parseSelectColumns(string $sql): array
