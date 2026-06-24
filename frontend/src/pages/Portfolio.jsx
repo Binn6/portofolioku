@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { getProfile, getSkills, getProjects, getExperiences, getEducation, getCertificates } from '../services/api'
 import SplashScreen from '../components/animations/SplashScreen'
-import ScrollProgressBar from '../components/animations/ScrollProgressBar'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import Hero from '../components/sections/Hero'
@@ -23,6 +22,11 @@ export default function Portfolio() {
   const [showSplash, setShowSplash] = useState(false)
   const [copyAlert, setCopyAlert] = useState(false)
   const alertTimer = useRef(null)
+
+  useEffect(() => {
+    document.documentElement.classList.add('no-scrollbar')
+    return () => document.documentElement.classList.remove('no-scrollbar')
+  }, [])
 
   useEffect(() => {
     const showAlert = () => {
@@ -92,7 +96,6 @@ export default function Portfolio() {
 
   return (
     <div className="select-none">
-      <ScrollProgressBar />
       <Navbar />
       <main>
         <Hero profile={data.profile} />

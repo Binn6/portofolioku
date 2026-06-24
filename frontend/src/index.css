@@ -20,6 +20,14 @@
   .glass {
     @apply bg-surface/60 backdrop-blur-md border border-border;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Allow text selection inside inputs even when parent has select-none */
