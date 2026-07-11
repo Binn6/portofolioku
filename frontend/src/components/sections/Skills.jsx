@@ -1,37 +1,24 @@
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { staggerContainer, flipIn3D } from '../../animations/variants'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionWrapper from '../layout/SectionWrapper'
-import Container from '../layout/Container'
+import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 import { useTilt } from '../ui/Tilt3D'
+import { useParallax } from '../../hooks/useParallax'
 
 const CATEGORIES = ['Languages', 'Frameworks', 'Data', 'Tools', 'Soft Skills']
 const LEVEL_LABEL = ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert']
 
-export default function Skills({ skills }) {
-  const grouped = CATEGORIES.reduce((acc, cat) => {
-    const items = (skills || []).filter((s) => s.category === cat)
-    if (items.length) acc[cat] = items
-    return acc
-  }, {})
-
-  if (!Object.keys(grouped).length) return null
+function ParallaxCategoryBlock({ cat, items, rowIndex }) {
+  const rowRef = useRef(null)
+  // Odd rows float up (-20), even rows drift down (+20) for breathing grid effect
+  useParallax(rowRef, { yOffset: rowIndex % 2 === 0 ? -20 : 20 })
 
   return (
-    <SectionWrapper id="skills" className="bg-surface/30">
-      <Container>
-        <AnimatedSection>
-          <SectionTitle subtitle="Technologies and tools I work with">Skills</SectionTitle>
-        </AnimatedSection>
-
-        <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
-          {Object.entries(grouped).map(([cat, items]) => (
-            <CategoryBlock key={cat} cat={cat} items={items} />
-          ))}
-        </div>
-      </Container>
-    </SectionWrapper>
+    <div ref={rowRef}>
+      <CategoryBlock cat={cat} items={items} />
+    </div>
   )
 }
 
@@ -92,5 +79,32 @@ function CategoryBlock({ cat, items }) {
         style={{ background: glareBg }}
       />
     </motion.div>
+  )
+}
+
+export default function Skills({ skills }) {
+  const grouped = CATEGORIES.reduce((acc, cat) => {
+    const items = (skills || []).filter((s) => s.category === cat)
+    if (items.length) acc[cat] = items
+    return acc
+  }, {})
+
+  if (!Object.keys(grouped).length) return null
+
+  const entries = Object.entries(grouped)
+
+  return (
+    <SectionPanel id="skills" index={1}>
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
+        <AnimatedSection>
+          <SectionTitle subtitle="Technologies and tools I work with">Skills</SectionTitle>
+        </AnimatedSection>
+        <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
+          {entries.map(([cat, items], i) => (
+            <ParallaxCategoryBlock key={cat} cat={cat} items={items} rowIndex={i} />
+          ))}
+        </div>
+      </div>
+    </SectionPanel>
   )
 }
