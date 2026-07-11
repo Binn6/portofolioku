@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Send, Code2, Briefcase, Mail, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { postContact } from '../../services/api'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionWrapper from '../layout/SectionWrapper'
-import Container from '../layout/Container'
+import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 import MotionButton from '../ui/MotionButton'
 import WireframeCube from '../ui/WireframeCube'
 import Tilt3D from '../ui/Tilt3D'
+import { gsap } from '../../animations/gsap'
+import { prefersReducedMotion } from '../../animations/gsap'
 
 const ensureUrl = (url) => url && (/^https?:\/\//.test(url) ? url : `https://${url}`)
 const waUrl = (phone) => {
@@ -24,6 +25,21 @@ export default function Contact({ profile }) {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
+  const glowRef = useRef(null)
+
+  useEffect(() => {
+    if (prefersReducedMotion()) return
+    if (!glowRef.current) return
+    const tween = gsap.to(glowRef.current, {
+      opacity: 0.12,
+      scale: 1.15,
+      duration: 3,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+    })
+    return () => tween.kill()
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -41,8 +57,19 @@ export default function Contact({ profile }) {
   const inputClass = 'w-full bg-surface-2 border border-border rounded-lg px-4 py-3 text-sm text-accent placeholder-accent-dim focus:outline-none focus:border-accent-muted transition-colors'
 
   return (
-    <SectionWrapper id="contact">
-      <Container>
+    <SectionPanel id="contact" index={6} isLast={true}>
+      {/* Ambient glow behind content */}
+      <div
+        ref={glowRef}
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(250,250,249,0.06) 0%, transparent 70%)',
+          opacity: 0.06,
+          zIndex: 0,
+        }}
+      />
+
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
         <AnimatedSection>
           <SectionTitle subtitle="Let's work together">Get in Touch</SectionTitle>
         </AnimatedSection>
@@ -129,7 +156,7 @@ export default function Contact({ profile }) {
             </Tilt3D>
           </AnimatedSection>
         </div>
-      </Container>
-    </SectionWrapper>
+      </div>
+    </SectionPanel>
   )
 }
