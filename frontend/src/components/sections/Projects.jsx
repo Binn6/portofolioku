@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Code2, ExternalLink, X, Download } from 'lucide-react'
 import { staggerContainer } from '../../animations/variants'
 import { useTilt } from '../ui/Tilt3D'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionWrapper from '../layout/SectionWrapper'
-import Container from '../layout/Container'
+import SectionPanel from '../layout/SectionPanel'
+import { useParallax } from '../../hooks/useParallax'
 import SectionTitle from '../ui/SectionTitle'
 
 const PROJECT_TYPES = ['All', 'Website', 'Data Analysis']
@@ -37,6 +37,20 @@ const matchesFilter = (project, filter) => {
   return true
 }
 
+function ParallaxWrapper({ children, yOffset }) {
+  const ref = useRef(null)
+  useParallax(ref, { yOffset })
+  return <div ref={ref} className="min-h-[200px]">{children}</div>
+}
+
+function ProjectCardWithParallax({ children, colIndex }) {
+  const yOffset = colIndex === 0 ? -12 : colIndex === 2 ? 12 : 0
+  if (yOffset === 0) {
+    return <div className="min-h-[200px]">{children}</div>
+  }
+  return <ParallaxWrapper yOffset={yOffset}>{children}</ParallaxWrapper>
+}
+
 export default function Projects({ projects }) {
   const navigate = useNavigate()
   const [filter, setFilter] = useState('All')
@@ -57,14 +71,14 @@ export default function Projects({ projects }) {
   }, [])
 
   return (
-    <SectionWrapper id="projects">
-      <Container>
+    <SectionPanel id="projects" index={2}>
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
         <AnimatedSection>
           <SectionTitle subtitle="Things I've built">Projects</SectionTitle>
         </AnimatedSection>
 
         {(projects?.length > 0) && (
-          <div className="flex flex-wrap gap-2 mb-10">
+          <div className="flex flex-wrap gap-2 mb-6">
             {PROJECT_TYPES.map((type) => (
               <button
                 key={type}
@@ -86,18 +100,19 @@ export default function Projects({ projects }) {
           viewport={{ once: true }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {/* SQL Mission Control — featured interactive project */}
-          <SqlMissionCard navigate={navigate} />
+          <ProjectCardWithParallax colIndex={0}>
+            <SqlMissionCard navigate={navigate} />
+          </ProjectCardWithParallax>
 
-          {filtered.map((project) => (
-            <div key={getId(project)} className="min-h-[200px]">
+          {filtered.map((project, i) => (
+            <ProjectCardWithParallax key={getId(project)} colIndex={(i + 1) % 3}>
               {(!selectedProject || getId(selectedProject) !== getId(project)) && (
                 <ProjectCard project={project} onSelect={setSelectedProject} />
               )}
-            </div>
+            </ProjectCardWithParallax>
           ))}
         </motion.div>
-      </Container>
+      </div>
 
       <AnimatePresence>
         {selectedProject && (
@@ -177,7 +192,7 @@ export default function Projects({ projects }) {
           </>
         )}
       </AnimatePresence>
-    </SectionWrapper>
+    </SectionPanel>
   )
 }
 
