@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Briefcase, Users } from 'lucide-react'
 import { staggerContainer, depth3D } from '../../animations/variants'
-import { gsap, ScrollTrigger } from '../../animations/gsap'
+import { gsap } from '../../animations/gsap'
 import { prefersReducedMotion } from '../../animations/gsap'
 import AnimatedSection from '../animations/AnimatedSection'
 import SectionPanel from '../layout/SectionPanel'
@@ -17,7 +17,7 @@ export default function Experience({ experiences }) {
     if (!line) return
     const panel = line.closest('[data-panel-inner]') ?? line.parentElement
 
-    gsap.fromTo(
+    const tween = gsap.fromTo(
       line,
       { scaleY: 0, transformOrigin: 'top center' },
       {
@@ -31,6 +31,7 @@ export default function Experience({ experiences }) {
         },
       }
     )
+    return () => tween.kill()
   }, [])
 
   return (
