@@ -1,10 +1,11 @@
+import { useRef } from 'react'
 import { MapPin, Mail, Phone } from 'lucide-react'
 import { motion } from 'framer-motion'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionWrapper from '../layout/SectionWrapper'
-import Container from '../layout/Container'
+import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 import { useTilt } from '../ui/Tilt3D'
+import { useParallax } from '../../hooks/useParallax'
 
 function IconGithub() {
   return (
@@ -40,50 +41,52 @@ const socialLinks = (profile) => [
 
 export default function About({ profile }) {
   const links = socialLinks(profile).filter((l) => l.show)
+  const cardRef = useRef(null)
+  useParallax(cardRef, { yOffset: 30 })
 
   return (
-    <SectionWrapper id="about">
-      <Container>
+    <SectionPanel id="about" index={0}>
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center">
         <AnimatedSection>
           <SectionTitle subtitle="A bit about me">About</SectionTitle>
         </AnimatedSection>
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="order-2 md:order-1">
-          <AnimatedSection>
-            <p className="text-accent-muted leading-relaxed text-lg mb-6">
-              {profile?.bio}
-            </p>
-            <div className="flex flex-col gap-3">
-              {profile?.location && (
-                <div className="flex items-center gap-3 text-accent-muted text-sm">
-                  <MapPin size={16} className="text-accent-dim shrink-0" />
-                  {profile.location}
-                </div>
-              )}
-              {profile?.email && (
-                <div className="flex items-center gap-3 text-accent-muted text-sm">
-                  <Mail size={16} className="text-accent-dim shrink-0" />
-                  {profile.email}
-                </div>
-              )}
-              {profile?.phone && (
-                <div className="flex items-center gap-3 text-accent-muted text-sm">
-                  <Phone size={16} className="text-accent-dim shrink-0" />
-                  {profile.phone}
-                </div>
-              )}
-            </div>
-          </AnimatedSection>
+            <AnimatedSection>
+              <p className="text-accent-muted leading-relaxed text-lg mb-6">
+                {profile?.bio}
+              </p>
+              <div className="flex flex-col gap-3">
+                {profile?.location && (
+                  <div className="flex items-center gap-3 text-accent-muted text-sm">
+                    <MapPin size={16} className="text-accent-dim shrink-0" />
+                    {profile.location}
+                  </div>
+                )}
+                {profile?.email && (
+                  <div className="flex items-center gap-3 text-accent-muted text-sm">
+                    <Mail size={16} className="text-accent-dim shrink-0" />
+                    {profile.email}
+                  </div>
+                )}
+                {profile?.phone && (
+                  <div className="flex items-center gap-3 text-accent-muted text-sm">
+                    <Phone size={16} className="text-accent-dim shrink-0" />
+                    {profile.phone}
+                  </div>
+                )}
+              </div>
+            </AnimatedSection>
           </div>
 
-          <div className="order-1 md:order-2">
-          <AnimatedSection>
-            <ProfileCard profile={profile} links={links} />
-          </AnimatedSection>
+          <div ref={cardRef} className="order-1 md:order-2">
+            <AnimatedSection>
+              <ProfileCard profile={profile} links={links} />
+            </AnimatedSection>
           </div>
         </div>
-      </Container>
-    </SectionWrapper>
+      </div>
+    </SectionPanel>
   )
 }
 
