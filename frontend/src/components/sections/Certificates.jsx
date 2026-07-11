@@ -4,8 +4,7 @@ import { ExternalLink, Download } from 'lucide-react'
 import { staggerContainer, scaleIn } from '../../animations/variants'
 import { useTilt } from '../ui/Tilt3D'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionWrapper from '../layout/SectionWrapper'
-import Container from '../layout/Container'
+import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 
 export default function Certificates({ certificates }) {
@@ -15,13 +14,13 @@ export default function Certificates({ certificates }) {
     : (certificates || []).filter((c) => c.category === filter)
 
   return (
-    <SectionWrapper id="certificates" className="bg-surface/30">
-      <Container>
+    <SectionPanel id="certificates" index={5}>
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
         <AnimatedSection>
           <SectionTitle subtitle="Courses and certifications I've completed">Certificates</SectionTitle>
         </AnimatedSection>
         {(certificates?.length > 0) && (
-          <div className="flex gap-2 mb-10">
+          <div className="flex gap-2 mb-8">
             {['All', 'Web', 'Data'].map((f) => (
               <button
                 key={f}
@@ -50,8 +49,8 @@ export default function Certificates({ certificates }) {
             ))}
           </AnimatePresence>
         </motion.div>
-      </Container>
-    </SectionWrapper>
+      </div>
+    </SectionPanel>
   )
 }
 
