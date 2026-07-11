@@ -41,7 +41,7 @@ input, textarea, select {
   user-select: text;
 }
 
-/* ── Custom scrollbars — tactical terminal aesthetic ─────────────────── */
+/* ── Custom scrollbars — minimal neutral ─────────────────────────────── */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -50,20 +50,30 @@ input, textarea, select {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 65, 0.12);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  transition: background 0.2s;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 65, 0.45);
-  box-shadow: 0 0 6px rgba(0, 255, 65, 0.3);
+  background: rgba(255, 255, 255, 0.18);
 }
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
-
-/* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 255, 65, 0.12) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+/* ── Mobile: disable sticky stacking, show sections naturally ─────────── */
+@media (max-width: 767px) {
+  .section-panel-outer {
+    height: auto !important;
+    margin-bottom: 0 !important;
+  }
+  .panel-inner {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100svh;
+    overflow: visible !important;
+  }
 }

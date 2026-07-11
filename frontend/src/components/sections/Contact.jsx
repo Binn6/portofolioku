@@ -69,7 +69,7 @@ export default function Contact({ profile }) {
         }}
       />
 
-      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col overflow-y-auto no-scrollbar">
         <AnimatedSection>
           <SectionTitle subtitle="Let's work together">Get in Touch</SectionTitle>
         </AnimatedSection>

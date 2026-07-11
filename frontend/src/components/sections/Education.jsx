@@ -9,7 +9,7 @@ import { useTilt } from '../ui/Tilt3D'
 export default function Education({ education }) {
   return (
     <SectionPanel id="education" index={4}>
-      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col overflow-y-auto no-scrollbar">
         <AnimatedSection>
           <SectionTitle subtitle="My academic background">Education</SectionTitle>
         </AnimatedSection>

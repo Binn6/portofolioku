@@ -30,6 +30,7 @@ export default function SectionPanel({ id, index = 0, isLast = false, children, 
   useEffect(() => {
     if (prefersReducedMotion()) return
     if (isLast) return
+    if (window.matchMedia('(max-width: 767px)').matches) return
     const inner = innerRef.current
     const overlay = overlayRef.current
     if (!inner || !overlay) return
@@ -51,7 +52,11 @@ export default function SectionPanel({ id, index = 0, isLast = false, children, 
   }, [isLast])
 
   return (
-    <div ref={outerRef} style={{ height: '150vh', position: 'relative' }}>
+    <div
+      ref={outerRef}
+      className="section-panel-outer"
+      style={{ height: '250vh', position: 'relative', marginBottom: isLast ? 0 : '-100vh' }}
+    >
       <section
         id={id}
         ref={innerRef}

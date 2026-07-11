@@ -72,7 +72,7 @@ export default function Projects({ projects }) {
 
   return (
     <SectionPanel id="projects" index={2}>
-      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col overflow-y-auto no-scrollbar">
         <AnimatedSection>
           <SectionTitle subtitle="Things I've built">Projects</SectionTitle>
         </AnimatedSection>
