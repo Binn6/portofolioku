@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
+import { useLenis } from '../hooks/useLenis'
 import { getProfile, getSkills, getProjects, getExperiences, getEducation, getCertificates } from '../services/api'
 import SplashScreen from '../components/animations/SplashScreen'
 import Navbar from '../components/layout/Navbar'
@@ -82,6 +83,8 @@ export default function Portfolio() {
       }, 300)
     }
   }, [ready, section])
+
+  useLenis()
 
   if (!ready || (showSplash && !splashDone)) {
     if (showSplash) {
