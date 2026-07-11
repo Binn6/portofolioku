@@ -103,13 +103,15 @@ export default function Portfolio() {
       <main>
         <Hero profile={data.profile} />
         <Ticker />
-        <About profile={data.profile} />
-        <Skills skills={data.skills} />
-        <Projects projects={data.projects} />
-        <Experience experiences={data.experiences} />
-        <Education education={data.education} />
-        <Certificates certificates={data.certificates} />
-        <Contact profile={data.profile} />
+        <div className="relative">
+          <About profile={data.profile} />
+          <Skills skills={data.skills} />
+          <Projects projects={data.projects} />
+          <Experience experiences={data.experiences} />
+          <Education education={data.education} />
+          <Certificates certificates={data.certificates} />
+          <Contact profile={data.profile} />
+        </div>
       </main>
       <Footer profile={data.profile} />
 

@@ -28,6 +28,11 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .panel-inner {
+    transform-origin: top center;
+    will-change: transform;
+  }
 }
 
 /* Allow text selection inside inputs even when parent has select-none */
