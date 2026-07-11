@@ -2,15 +2,14 @@ import { motion } from 'framer-motion'
 import { GraduationCap } from 'lucide-react'
 import { staggerContainer, depth3D } from '../../animations/variants'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionWrapper from '../layout/SectionWrapper'
-import Container from '../layout/Container'
+import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 import { useTilt } from '../ui/Tilt3D'
 
 export default function Education({ education }) {
   return (
-    <SectionWrapper id="education">
-      <Container>
+    <SectionPanel id="education" index={4}>
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
         <AnimatedSection>
           <SectionTitle subtitle="My academic background">Education</SectionTitle>
         </AnimatedSection>
@@ -28,8 +27,8 @@ export default function Education({ education }) {
             </motion.div>
           ))}
         </motion.div>
-      </Container>
-    </SectionWrapper>
+      </div>
+    </SectionPanel>
   )
 }
 
