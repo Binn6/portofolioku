@@ -1,15 +1,41 @@
+import { useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Briefcase, Users } from 'lucide-react'
 import { staggerContainer, depth3D } from '../../animations/variants'
+import { gsap, ScrollTrigger } from '../../animations/gsap'
+import { prefersReducedMotion } from '../../animations/gsap'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionWrapper from '../layout/SectionWrapper'
-import Container from '../layout/Container'
+import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 
 export default function Experience({ experiences }) {
+  const lineRef = useRef(null)
+
+  useEffect(() => {
+    if (prefersReducedMotion()) return
+    const line = lineRef.current
+    if (!line) return
+    const panel = line.closest('[data-panel-inner]') ?? line.parentElement
+
+    gsap.fromTo(
+      line,
+      { scaleY: 0, transformOrigin: 'top center' },
+      {
+        scaleY: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: panel,
+          start: 'top 80%',
+          end: 'bottom 20%',
+          scrub: 1.5,
+        },
+      }
+    )
+  }, [])
+
   return (
-    <SectionWrapper id="experience" className="bg-surface/30">
-      <Container>
+    <SectionPanel id="experience" index={3}>
+      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col justify-center overflow-y-auto">
         <AnimatedSection>
           <SectionTitle subtitle="Where I've worked and contributed">Experience</SectionTitle>
         </AnimatedSection>
@@ -18,9 +44,16 @@ export default function Experience({ experiences }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="relative pl-6 border-l border-border space-y-10"
+          className="relative pl-6 space-y-10"
           style={{ perspective: '900px' }}
         >
+          {/* Animated timeline line */}
+          <div
+            ref={lineRef}
+            className="absolute left-0 top-0 bottom-0 w-px bg-border"
+            style={{ transformOrigin: 'top center' }}
+          />
+
           {(experiences || []).map((exp) => (
             <motion.div
               key={exp.id ?? exp._id}
@@ -60,7 +93,7 @@ export default function Experience({ experiences }) {
             </motion.div>
           ))}
         </motion.div>
-      </Container>
-    </SectionWrapper>
+      </div>
+    </SectionPanel>
   )
 }
