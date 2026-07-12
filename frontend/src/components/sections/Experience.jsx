@@ -36,7 +36,7 @@ export default function Experience({ experiences }) {
 
   return (
     <SectionPanel id="experience" index={3}>
-      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col overflow-y-auto no-scrollbar">
+      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="Where I've worked and contributed">Experience</SectionTitle>
         </AnimatedSection>

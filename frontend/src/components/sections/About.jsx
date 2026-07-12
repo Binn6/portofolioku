@@ -46,7 +46,7 @@ export default function About({ profile }) {
 
   return (
     <SectionPanel id="about" index={0}>
-      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col overflow-y-auto no-scrollbar">
+      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="A bit about me">About</SectionTitle>
         </AnimatedSection>

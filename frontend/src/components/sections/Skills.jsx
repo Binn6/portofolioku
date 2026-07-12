@@ -95,7 +95,7 @@ export default function Skills({ skills }) {
 
   return (
     <SectionPanel id="skills" index={1}>
-      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col overflow-y-auto no-scrollbar">
+      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="Technologies and tools I work with">Skills</SectionTitle>
         </AnimatedSection>

@@ -5,10 +5,11 @@
 @tailwind utilities;
 
 @layer base {
-  html, body {
-    overflow-x: hidden;
+  html {
+    overflow-x: clip; /* clip ≠ hidden: doesn't create scroll container, preserves sticky */
   }
   body {
+    overflow-x: clip;
     @apply bg-background text-accent font-sans antialiased;
   }
   * {
@@ -74,6 +75,6 @@ input, textarea, select {
     position: relative !important;
     height: auto !important;
     min-height: 100svh;
-    overflow: visible !important;
+    overflow: clip !important; /* clip: preserves border-radius, doesn't restrict height */
   }
 }

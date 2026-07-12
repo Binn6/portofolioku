@@ -61,7 +61,8 @@ export default function SectionPanel({ id, index = 0, isLast = false, children, 
         id={id}
         ref={innerRef}
         data-panel-inner="true"
-        className={`panel-inner sticky top-0 h-screen overflow-hidden ${className}`}
+        className={`panel-inner sticky top-0 h-screen overflow-y-auto no-scrollbar ${className}`}
+        data-lenis-prevent=""
         style={{
           zIndex: 10 + index,
           borderRadius: '24px 24px 0 0',
@@ -85,8 +86,8 @@ export default function SectionPanel({ id, index = 0, isLast = false, children, 
           style={{ opacity: 0, zIndex: 30 }}
         />
 
-        {/* Content above overlay */}
-        <div className="relative h-full" style={{ zIndex: 1 }}>
+        {/* Content sits above overlay, natural height so section can scroll */}
+        <div className="relative" style={{ zIndex: 1 }}>
           {children}
         </div>
       </section>

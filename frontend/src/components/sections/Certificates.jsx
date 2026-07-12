@@ -15,7 +15,7 @@ export default function Certificates({ certificates }) {
 
   return (
     <SectionPanel id="certificates" index={5}>
-      <div className="max-w-6xl mx-auto px-6 py-16 h-full flex flex-col overflow-y-auto no-scrollbar">
+      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="Courses and certifications I've completed">Certificates</SectionTitle>
         </AnimatedSection>
