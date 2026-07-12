@@ -8,7 +8,7 @@ import { useTilt } from '../ui/Tilt3D'
 
 export default function Education({ education }) {
   return (
-    <SectionPanel id="education" index={4}>
+    <SectionPanel id="education" index={0}>
       <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="My academic background">Education</SectionTitle>

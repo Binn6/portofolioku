@@ -14,7 +14,7 @@ export default function Certificates({ certificates }) {
     : (certificates || []).filter((c) => c.category === filter)
 
   return (
-    <SectionPanel id="certificates" index={5}>
+    <SectionPanel id="certificates" index={1}>
       <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="Courses and certifications I've completed">Certificates</SectionTitle>

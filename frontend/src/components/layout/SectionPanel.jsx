@@ -3,23 +3,15 @@ import { gsap, ScrollTrigger } from '../../animations/gsap'
 import { prefersReducedMotion } from '../../animations/gsap'
 
 const PANEL_BG = [
-  '#111111', // 0 About
-  '#0f0f0f', // 1 Skills
-  '#111111', // 2 Projects
-  '#0d0d0d', // 3 Experience
-  '#111111', // 4 Education
-  '#0f0f0f', // 5 Certificates
-  '#0a0a0a', // 6 Contact
+  '#111111', // 0 Education
+  '#0f0f0f', // 1 Certificates
+  '#0a0a0a', // 2 Contact
 ]
 
 const PANEL_BORDER_TOP = [
-  'rgba(255,255,255,0.06)',
-  'rgba(255,255,255,0.04)',
-  'rgba(255,255,255,0.06)',
-  'rgba(255,255,255,0.05)',
-  'rgba(255,255,255,0.04)',
-  'rgba(255,255,255,0.05)',
-  'rgba(250,249,246,0.10)',
+  'rgba(255,255,255,0.04)', // Education
+  'rgba(255,255,255,0.05)', // Certificates
+  'rgba(250,249,246,0.10)', // Contact
 ]
 
 export default function SectionPanel({ id, index = 0, isLast = false, children, className = '' }) {

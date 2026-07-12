@@ -1,26 +1,11 @@
-import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { staggerContainer, flipIn3D } from '../../animations/variants'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 import { useTilt } from '../ui/Tilt3D'
-import { useParallax } from '../../hooks/useParallax'
 
 const CATEGORIES = ['Languages', 'Frameworks', 'Data', 'Tools', 'Soft Skills']
 const LEVEL_LABEL = ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert']
-
-function ParallaxCategoryBlock({ cat, items, rowIndex }) {
-  const rowRef = useRef(null)
-  // Odd rows float up (-20), even rows drift down (+20) for breathing grid effect
-  useParallax(rowRef, { yOffset: rowIndex % 2 === 0 ? -20 : 20 })
-
-  return (
-    <div ref={rowRef}>
-      <CategoryBlock cat={cat} items={items} />
-    </div>
-  )
-}
 
 function CategoryBlock({ cat, items }) {
   const { ref, rotateX, rotateY, glareBg, onMouseMove, onMouseLeave } = useTilt(4)
@@ -94,17 +79,17 @@ export default function Skills({ skills }) {
   const entries = Object.entries(grouped)
 
   return (
-    <SectionPanel id="skills" index={1}>
-      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
+    <section id="skills" className="relative min-h-screen" style={{ background: '#0f0f0f' }}>
+      <div className="max-w-6xl mx-auto px-6 py-20 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="Technologies and tools I work with">Skills</SectionTitle>
         </AnimatedSection>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
-          {entries.map(([cat, items], i) => (
-            <ParallaxCategoryBlock key={cat} cat={cat} items={items} rowIndex={i} />
+          {entries.map(([cat, items]) => (
+            <CategoryBlock key={cat} cat={cat} items={items} />
           ))}
         </div>
       </div>
-    </SectionPanel>
+    </section>
   )
 }

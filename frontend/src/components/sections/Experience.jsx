@@ -5,17 +5,16 @@ import { staggerContainer, depth3D } from '../../animations/variants'
 import { gsap } from '../../animations/gsap'
 import { prefersReducedMotion } from '../../animations/gsap'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 
 export default function Experience({ experiences }) {
+  const sectionRef = useRef(null)
   const lineRef = useRef(null)
 
   useEffect(() => {
     if (prefersReducedMotion()) return
     const line = lineRef.current
     if (!line) return
-    const panel = line.closest('[data-panel-inner]') ?? line.parentElement
 
     const tween = gsap.fromTo(
       line,
@@ -24,7 +23,7 @@ export default function Experience({ experiences }) {
         scaleY: 1,
         ease: 'none',
         scrollTrigger: {
-          trigger: panel,
+          trigger: sectionRef.current,
           start: 'top 80%',
           end: 'bottom 20%',
           scrub: 1.5,
@@ -35,8 +34,8 @@ export default function Experience({ experiences }) {
   }, [])
 
   return (
-    <SectionPanel id="experience" index={3}>
-      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
+    <section id="experience" ref={sectionRef} className="relative min-h-screen" style={{ background: '#0d0d0d' }}>
+      <div className="max-w-6xl mx-auto px-6 py-20 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="Where I've worked and contributed">Experience</SectionTitle>
         </AnimatedSection>
@@ -95,6 +94,6 @@ export default function Experience({ experiences }) {
           ))}
         </motion.div>
       </div>
-    </SectionPanel>
+    </section>
   )
 }

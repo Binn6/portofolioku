@@ -1,12 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Code2, ExternalLink, X, Download } from 'lucide-react'
 import { staggerContainer } from '../../animations/variants'
 import { useTilt } from '../ui/Tilt3D'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionPanel from '../layout/SectionPanel'
-import { useParallax } from '../../hooks/useParallax'
 import SectionTitle from '../ui/SectionTitle'
 
 const PROJECT_TYPES = ['All', 'Website', 'Data Analysis']
@@ -37,19 +35,6 @@ const matchesFilter = (project, filter) => {
   return true
 }
 
-function ParallaxWrapper({ children, yOffset }) {
-  const ref = useRef(null)
-  useParallax(ref, { yOffset })
-  return <div ref={ref} className="min-h-[200px]">{children}</div>
-}
-
-function ProjectCardWithParallax({ children, colIndex }) {
-  const yOffset = colIndex === 0 ? -12 : colIndex === 2 ? 12 : 0
-  if (yOffset === 0) {
-    return <div className="min-h-[200px]">{children}</div>
-  }
-  return <ParallaxWrapper yOffset={yOffset}>{children}</ParallaxWrapper>
-}
 
 export default function Projects({ projects }) {
   const navigate = useNavigate()
@@ -71,8 +56,8 @@ export default function Projects({ projects }) {
   }, [])
 
   return (
-    <SectionPanel id="projects" index={2}>
-      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
+    <section id="projects" className="relative min-h-screen" style={{ background: '#111111' }}>
+      <div className="max-w-6xl mx-auto px-6 py-20 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="Things I've built">Projects</SectionTitle>
         </AnimatedSection>
@@ -100,16 +85,16 @@ export default function Projects({ projects }) {
           viewport={{ once: true }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          <ProjectCardWithParallax colIndex={0}>
+          <div className="min-h-[200px]">
             <SqlMissionCard navigate={navigate} />
-          </ProjectCardWithParallax>
+          </div>
 
-          {filtered.map((project, i) => (
-            <ProjectCardWithParallax key={getId(project)} colIndex={(i + 1) % 3}>
+          {filtered.map((project) => (
+            <div key={getId(project)} className="min-h-[200px]">
               {(!selectedProject || getId(selectedProject) !== getId(project)) && (
                 <ProjectCard project={project} onSelect={setSelectedProject} />
               )}
-            </ProjectCardWithParallax>
+            </div>
           ))}
         </motion.div>
       </div>
@@ -192,7 +177,7 @@ export default function Projects({ projects }) {
           </>
         )}
       </AnimatePresence>
-    </SectionPanel>
+    </section>
   )
 }
 

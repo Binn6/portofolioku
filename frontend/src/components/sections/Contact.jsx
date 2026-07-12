@@ -57,7 +57,7 @@ export default function Contact({ profile }) {
   const inputClass = 'w-full bg-surface-2 border border-border rounded-lg px-4 py-3 text-sm text-accent placeholder-accent-dim focus:outline-none focus:border-accent-muted transition-colors'
 
   return (
-    <SectionPanel id="contact" index={6} isLast={true}>
+    <SectionPanel id="contact" index={2} isLast={true}>
       {/* Ambient glow behind content */}
       <div
         ref={glowRef}

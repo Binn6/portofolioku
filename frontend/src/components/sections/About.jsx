@@ -1,11 +1,8 @@
-import { useRef } from 'react'
 import { MapPin, Mail, Phone } from 'lucide-react'
 import { motion } from 'framer-motion'
 import AnimatedSection from '../animations/AnimatedSection'
-import SectionPanel from '../layout/SectionPanel'
 import SectionTitle from '../ui/SectionTitle'
 import { useTilt } from '../ui/Tilt3D'
-import { useParallax } from '../../hooks/useParallax'
 
 function IconGithub() {
   return (
@@ -41,12 +38,10 @@ const socialLinks = (profile) => [
 
 export default function About({ profile }) {
   const links = socialLinks(profile).filter((l) => l.show)
-  const cardRef = useRef(null)
-  useParallax(cardRef, { yOffset: 30 })
 
   return (
-    <SectionPanel id="about" index={0}>
-      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col">
+    <section id="about" className="relative min-h-screen" style={{ background: '#111111' }}>
+      <div className="max-w-6xl mx-auto px-6 py-20 flex flex-col">
         <AnimatedSection>
           <SectionTitle subtitle="A bit about me">About</SectionTitle>
         </AnimatedSection>
@@ -79,14 +74,14 @@ export default function About({ profile }) {
             </AnimatedSection>
           </div>
 
-          <div ref={cardRef} className="order-1 md:order-2">
+          <div className="order-1 md:order-2">
             <AnimatedSection>
               <ProfileCard profile={profile} links={links} />
             </AnimatedSection>
           </div>
         </div>
       </div>
-    </SectionPanel>
+    </section>
   )
 }
 
