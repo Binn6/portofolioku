@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Loader2 } from 'lucide-react'
-import { financeWalletSendMessage, financeWalletConfirm } from '../../services/api'
+import { Send, Loader2, Paperclip } from 'lucide-react'
+import { financeWalletSendMessage, financeWalletSendPhoto, financeWalletConfirm } from '../../services/api'
 import { getOrCreateVisitorTag } from '../../utils/financeWallet'
 
 const ACCOUNT_OPTIONS = ['Mandiri', 'BSI', 'Jago', 'Dana', 'Gopay', 'OVO']
@@ -51,6 +51,30 @@ export default function FinanceChatWidget({ onStateChanged }) {
       const reply = err?.response?.status === 429
         ? (err.response.data?.reply || 'Demo lagi ramai, coba lagi besok.')
         : 'Gagal mengirim pesan. Coba lagi.'
+      setMessages((prev) => [...prev, makeMessage('bot', reply)])
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || sending) return
+
+    setMessages((prev) => [...prev, makeMessage('user', `📷 ${file.name}`)])
+    setSending(true)
+    try {
+      const form = new FormData()
+      form.append('visitor_tag', visitorTag.current)
+      form.append('photo', file)
+      const payload = await financeWalletSendPhoto(form)
+      setMessages((prev) => [...prev, makeMessage('bot', payload.reply, buildPending(payload))])
+      onStateChanged?.()
+    } catch (err) {
+      const reply = err?.response?.status === 429
+        ? (err.response.data?.reply || 'Demo lagi ramai, coba lagi besok.')
+        : 'Gagal membaca struk. Coba foto yang lebih jelas.'
       setMessages((prev) => [...prev, makeMessage('bot', reply)])
     } finally {
       setSending(false)
@@ -117,6 +141,22 @@ export default function FinanceChatWidget({ onStateChanged }) {
         <div ref={bottomRef} />
       </div>
       <form onSubmit={handleSend} className="flex gap-2 p-3 border-t border-border">
+        <label
+          htmlFor="finance-wallet-receipt-upload"
+          className="flex items-center justify-center w-9 h-9 shrink-0 rounded-lg border border-border text-accent-muted hover:text-accent hover:border-accent-dim cursor-pointer"
+          title="Upload struk"
+        >
+          <Paperclip size={14} />
+          <span className="sr-only">Upload struk</span>
+          <input
+            id="finance-wallet-receipt-upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            disabled={sending}
+            onChange={handlePhotoChange}
+          />
+        </label>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}

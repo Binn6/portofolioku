@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import FinanceChatWidget from './FinanceChatWidget'
-import { financeWalletSendMessage, financeWalletConfirm } from '../../services/api'
+import { financeWalletSendMessage, financeWalletSendPhoto, financeWalletConfirm } from '../../services/api'
 
 vi.mock('../../services/api', () => ({
   financeWalletSendMessage: vi.fn(),
+  financeWalletSendPhoto: vi.fn(),
   financeWalletConfirm: vi.fn(),
 }))
 
@@ -61,5 +62,26 @@ describe('FinanceChatWidget', () => {
     await waitFor(() => {
       expect(financeWalletConfirm).toHaveBeenCalledWith({ pending_id: 'pending123', action: 'accept', choice: 'Mandiri' })
     })
+  })
+
+  it('uploads a receipt photo and renders the bot reply', async () => {
+    financeWalletSendPhoto.mockResolvedValue({
+      type: 'transaction',
+      reply: 'Tercatat: struk indomaret - Rp45.000 (Belanja).',
+      realokasi_suggestion: null,
+    })
+
+    render(<FinanceChatWidget />)
+
+    const file = new File(['fake-bytes'], 'struk.jpg', { type: 'image/jpeg' })
+    const input = screen.getByLabelText(/upload struk/i)
+    fireEvent.change(input, { target: { files: [file] } })
+
+    await waitFor(() => {
+      screen.getByText(/Tercatat: struk indomaret/)
+    })
+    expect(financeWalletSendPhoto).toHaveBeenCalledTimes(1)
+    const sentFormData = financeWalletSendPhoto.mock.calls[0][0]
+    expect(sentFormData.get('photo')).toBe(file)
   })
 })
