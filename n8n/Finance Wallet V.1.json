@@ -1,0 +1,2815 @@
+{
+  "name": "Finance Wallet V.1",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "id": "0092787e-ce72-4408-8b8f-b564592cc23b",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        2080
+      ],
+      "webhookId": "cba8ac17-b960-41ef-ba52-962e1f27ec1c",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      },
+      "notes": "Bot token disimpan di credential Telegram API n8n (bukan di JSON ini)."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.callback_query ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "84ff0434-d4f5-4bff-a8bd-2df795d8959a",
+      "name": "Ada Callback Konfirmasi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cb = $json.callback_query;\nconst parts = cb.data.split('|');\nconst prefix = parts[0];\nlet result = {\n  chat_id: cb.message.chat.id,\n  message_id: cb.message.message_id,\n  callback_query_id: cb.id\n};\n\nif (prefix === 'rlk' || prefix === 'no') {\n  result.tipe_callback = 'realokasi';\n  result.action = prefix;\n  result.pending_id = parts[1];\n} else if (prefix === 'acc') {\n  result.tipe_callback = 'rekening';\n  result.rekening_pilihan = parts[1];\n  result.pending_id = parts[2];\n} else if (prefix === 'katy' || prefix === 'katn') {\n  result.tipe_callback = 'kategori';\n  result.approve = (prefix === 'katy');\n  result.pending_id = parts[1];\n}\n\nreturn [{ json: result }];"
+      },
+      "id": "6ffea87b-da45-4dff-af9b-ede0e01cf1e3",
+      "name": "Parse Callback Router",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.tipe_callback === 'realokasi' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              },
+              "id": "21577ad6-b1ad-4c6f-908b-a28cdb8729cc"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "eca8ac83-e12a-4f5e-8ad7-e147bb9e2c9f",
+      "name": "Tipe: Realokasi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2496,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.tipe_callback === 'rekening' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5a018495-f6d1-416f-9adb-11971f3664c5",
+      "name": "Tipe: Rekening?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2496,
+        1824
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.message.photo ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "750fd7a8-6854-4034-a07d-ff19ff3ec78e",
+      "name": "Ada Foto?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        2368
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Parse Callback Router').first().json.pending_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        }
+      },
+      "id": "cc81e66f-5777-401e-9f69-b09f373c454f",
+      "name": "Ambil Data Pending Realokasi",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2720,
+        1568
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Parse Callback Router').first().json.action === 'rlk' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3f51446f-a1b8-4b2a-be21-9da3b073c3a3",
+      "name": "User Setuju Realokasi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.property_dari_page_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        }
+      },
+      "id": "debf4729-462f-41c2-abe1-bdfb82adab14",
+      "name": "Ambil Budget Sumber",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3152,
+        1488
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Ambil Data Pending Realokasi').first().json.property_ke_page_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        }
+      },
+      "id": "8c3dbc19-bff6-4384-a7da-8b902b17afb1",
+      "name": "Ambil Budget Tujuan",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3376,
+        1488
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const pending = $('Ambil Data Pending Realokasi').first().json;\nconst dari = $('Ambil Budget Sumber').first().json;\nconst ke = $input.first().json;\nconst jumlah = pending.property_jumlah;\n\nreturn [{\n  json: {\n    dari_page_id: dari.id,\n    dari_limit_baru: (dari.property_limit_bulanan || 0) - jumlah,\n    ke_page_id: ke.id,\n    ke_limit_baru: (ke.property_limit_bulanan || 0) + jumlah,\n    jumlah,\n    dari_kategori: pending.property_dari_kategori,\n    ke_kategori: pending.property_ke_kategori,\n    chat_id: $('Parse Callback Router').first().json.chat_id,\n    pending_id: pending.id\n  }\n}];"
+      },
+      "id": "fc96c5a2-b8ea-4389-aa1b-71bdd27401a0",
+      "name": "Hitung Limit Baru",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3600,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.dari_page_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Limit Bulanan|number",
+              "numberValue": "={{ $json.dari_limit_baru }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9e4bfeda-01f6-4301-bd00-406c2ba31979",
+      "name": "Update Limit Sumber",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3824,
+        1488
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Hitung Limit Baru').first().json.ke_page_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Limit Bulanan|number",
+              "numberValue": "={{ $('Hitung Limit Baru').first().json.ke_limit_baru }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f21e7f3a-c6d4-478c-aade-8b7db5d23829",
+      "name": "Update Limit Tujuan",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4032,
+        1488
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Hitung Limit Baru').first().json.pending_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|select",
+              "selectValue": "Approved"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "06e6dc63-822b-4c3e-93d2-24e3b263b6fa",
+      "name": "Tandai Pending Realokasi Approved",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4256,
+        1488
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Hitung Limit Baru').first().json.chat_id }}",
+        "text": "={{ '✅ Realokasi jalan. Rp' + $('Hitung Limit Baru').first().json.jumlah.toLocaleString('id-ID') + ' pindah dari budget ' + $('Hitung Limit Baru').first().json.dari_kategori + ' ke ' + $('Hitung Limit Baru').first().json.ke_kategori + '.' }}",
+        "additionalFields": {}
+      },
+      "id": "a6877bff-d35a-4761-b743-2606aba4f6e4",
+      "name": "Balas: Realokasi Sukses",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4480,
+        1488
+      ],
+      "webhookId": "cff11e34-0379-4d0e-8ed0-fec15446622a",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Ambil Data Pending Realokasi').first().json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|select",
+              "selectValue": "Rejected"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "432dcc34-9785-46e8-9713-13fb9c23596f",
+      "name": "Tandai Pending Realokasi Rejected",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3152,
+        1648
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Callback Router').first().json.chat_id }}",
+        "text": "Oke, gak jadi realokasi. Budget tetap seperti semula.",
+        "additionalFields": {}
+      },
+      "id": "65c24228-cec6-4cd2-954a-8f35fa1e56ad",
+      "name": "Balas: Realokasi Ditolak",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3376,
+        1648
+      ],
+      "webhookId": "3246eb33-03e6-4746-9ab5-323715bf6c32",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Parse Callback Router').first().json.pending_id }}",
+          "mode": "id"
+        }
+      },
+      "id": "e2682b4a-9f5f-4c4a-bd12-f50c866eb708",
+      "name": "Ambil Data Pending Rekening (Callback)",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2720,
+        1824
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "=Status|select",
+              "selectValue": "=Selesai"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "df01819e-ca3f-4a46-9350-efbf7e28392e",
+      "name": "Tandai Pending Rekening Selesai",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2944,
+        1824
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const pending = $('Ambil Data Pending Rekening (Callback)').first().json;\nconst rekening = $('Parse Callback Router').first().json.rekening_pilihan;\nconst chat_id = $('Parse Callback Router').first().json.chat_id;\n\nreturn [{\n  json: {\n    deskripsi: pending.property_deskripsi,\n    tanggal: pending.property_tanggal,\n    jumlah: pending.property_jumlah,\n    tipe: pending.property_tipe,\n    kategori: pending.property_kategori,\n    rekening: rekening,\n    sumber: pending.property_sumber || 'Chat',\n    chat_id: chat_id\n  }\n}];"
+      },
+      "id": "78797dd1-4284-4f58-92a1-7aa673aa39fa",
+      "name": "Normalize Dari Pending",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        1824
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Parse Callback Router').first().json.pending_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        }
+      },
+      "id": "0480d83a-458e-4e5f-ab88-e8a2e225c9da",
+      "name": "Ambil Data Pending Kategori (Callback)",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2720,
+        1968
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Parse Callback Router').first().json.approve }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7604a168-56b7-4919-9752-4f6430d5f1ba",
+      "name": "Approve Kategori?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "7b043362-74e4-4474-8387-c0adb71050a3",
+          "mode": "list",
+          "cachedResultName": "Budget",
+          "cachedResultUrl": "https://app.notion.com/p/7b04336274e444748387c0adb71050a3"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Kategori|select",
+              "selectValue": "={{ $json.property_nama_kategori }}"
+            },
+            {
+              "key": "Limit Bulanan|number",
+              "numberValue": "={{ $json.property_limit_bulanan }}"
+            },
+            {
+              "key": "Terpakai Bulan Ini|number"
+            },
+            {
+              "key": "Nama|title",
+              "title": "={{ 'Budget ' + $json.property_nama_kategori }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "00436e8d-ffda-4635-ac6f-7f772d032412",
+      "name": "Buat Kategori Baru di Budget",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3152,
+        1920
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Ambil Data Pending Kategori (Callback)').first().json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "=Status",
+              "selectValue": "Approved"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "41f55515-92a5-4cc4-9c91-95d473b2f967",
+      "name": "Tandai Pending Kategori Approved",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3376,
+        1920
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Callback Router').first().json.chat_id }}",
+        "text": "={{ '✅ Kategori \\'' + $('Ambil Data Pending Kategori (Callback)').first().json.property_nama_kategori + '\\' udah dibuat di Budget dengan limit Rp' + $('Ambil Data Pending Kategori (Callback)').first().json.property_limit_bulanan.toLocaleString('id-ID') + '. Sekarang bisa langsung dipake buat nyatet transaksi.' }}",
+        "additionalFields": {}
+      },
+      "id": "76afe281-55b3-4d36-8f87-ca7dfb776314",
+      "name": "Balas: Kategori Dibuat",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3600,
+        1920
+      ],
+      "webhookId": "a740fdd2-38ef-4577-be55-8099abf8f04e",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "=Status",
+              "selectValue": "Rejected"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4706462-e0ea-4969-8709-b1b00944459c",
+      "name": "Tandai Pending Kategori Rejected",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3152,
+        2048
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Callback Router').first().json.chat_id }}",
+        "text": "Oke, gak jadi bikin kategori baru.",
+        "additionalFields": {}
+      },
+      "id": "9f557cc7-d5a0-42d3-a987-bf8b2acbf151",
+      "name": "Balas: Kategori Dibatalkan",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3376,
+        2048
+      ],
+      "webhookId": "64efad91-4ba9-49c3-a175-d8a0dda26f12",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[$json.message.photo.length - 1].file_id }}",
+        "additionalFields": {}
+      },
+      "id": "ec655afe-3865-4fdb-94e5-e9b4004de2da",
+      "name": "Download Struk",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2496,
+        2272
+      ],
+      "webhookId": "2dc7d2fc-9015-4ea0-9750-76ce237b29d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        { \"inline_data\": { \"mime_type\": \"image/jpeg\", \"data\": \"{{ $binary.data.data }}\" } },\n        { \"text\": \"Ekstrak data transaksi dari struk ini. Balas HANYA dengan JSON valid, tanpa teks lain, format persis: {\\\"tanggal\\\":\\\"YYYY-MM-DD\\\",\\\"jumlah\\\":angka,\\\"tipe\\\":\\\"Expense\\\",\\\"kategori\\\":\\\"salah satu dari: Makanan, Transport, Belanja, Tagihan, Hiburan, Lainnya\\\",\\\"deskripsi\\\":\\\"ringkasan singkat\\\"}\" }\n      ]\n    }\n  ],\n  \"generationConfig\": { \"maxOutputTokens\": 2048, \"temperature\": 0, \"thinkingConfig\": { \"thinkingBudget\": 0 } }\n}",
+        "options": {}
+      },
+      "id": "b91fb969-39e9-40cc-a0be-69bad68d0994",
+      "name": "Gemini - Baca Struk",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2720,
+        2272
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const res = $input.first().json;\nconst cand = res.candidates && res.candidates[0];\nif (!cand || !cand.content || !cand.content.parts) {\n  throw new Error('Gemini gak ngasih output valid. finishReason: ' + (cand ? cand.finishReason : 'tidak ada candidate'));\n}\nconst raw = cand.content.parts[0].text;\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nconst data = JSON.parse(cleaned);\nreturn [{ json: { ...data, sumber: 'Foto Struk' } }];"
+      },
+      "id": "5fd1faa6-6773-4e91-a3d4-375983e44c8f",
+      "name": "Parse Hasil Gemini (Struk)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        2272
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        { \"text\": \"Pesan user: '{{ $json.message.text }}'. Tanggal hari ini: {{ $now.toFormat('yyyy-LL-dd') }}. Klasifikasikan pesan ini lalu balas HANYA JSON valid tanpa teks lain.\\n\\nJika pesan tentang transaksi keuangan (pemasukan/pengeluaran), format: {\\\"jenis\\\":\\\"transaksi\\\",\\\"tanggal\\\":\\\"YYYY-MM-DD\\\",\\\"jumlah\\\":angka,\\\"tipe\\\":\\\"Expense atau Income\\\",\\\"kategori\\\":\\\"salah satu dari: Makanan, Transport, Belanja, Tagihan, Hiburan, Gaji, Lainnya\\\",\\\"deskripsi\\\":\\\"ringkasan singkat\\\",\\\"rekening\\\":\\\"salah satu dari: Mandiri, BSI, Jago, Dana, Gopay, OVO -- ATAU null kalau tidak disebutkan sama sekali di pesan\\\"}\\n\\nJika pesan minta bikin/tambah kategori budget baru, format: {\\\"jenis\\\":\\\"kategori_baru\\\",\\\"nama_kategori\\\":\\\"nama kategori yang diminta\\\",\\\"limit_bulanan\\\":angka atau 0 kalau tidak disebutkan}\\n\\nJika user nanya sisa saldo/berapa duit yang dia punya (semua rekening atau salah satu), format: {\\\"jenis\\\":\\\"cek_saldo\\\"}\\n\\nJika pesan tidak berkaitan dengan keuangan sama sekali, format: {\\\"jenis\\\":\\\"lainnya\\\"}\" }\n      ]\n    }\n  ],\n  \"generationConfig\": { \"maxOutputTokens\": 2048, \"temperature\": 0, \"thinkingConfig\": { \"thinkingBudget\": 0 } }\n}",
+        "options": {}
+      },
+      "id": "2f99795a-3d18-41a7-bf25-131a2d8d1def",
+      "name": "Gemini - Baca Teks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2496,
+        2528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const res = $input.first().json;\nconst cand = res.candidates && res.candidates[0];\nif (!cand || !cand.content || !cand.content.parts) {\n  throw new Error('Gemini gak ngasih output valid. finishReason: ' + (cand ? cand.finishReason : 'tidak ada candidate'));\n}\nconst raw = cand.content.parts[0].text;\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nconst data = JSON.parse(cleaned);\nif (data.jenis === 'transaksi') data.sumber = 'Chat';\nreturn [{ json: data }];"
+      },
+      "id": "4a5cfacc-beed-4e8c-8654-e9d61cb79170",
+      "name": "Parse Hasil Gemini (Teks)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        2528
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.jenis === 'kategori_baru' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ab3213ba-c19e-4dc7-a12b-40013ad2bfa8",
+      "name": "Jenis: Kategori Baru?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        2528
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.jenis === 'transaksi' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "be853f54-5578-420c-9da5-f28d7f36717c",
+      "name": "Jenis: Transaksi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        2624
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.rekening ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b234f471-a04e-4b67-a77a-6a60ca6e2383",
+      "name": "Rekening Disebut?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "Hmm, gak ngerti maksud lo apa. Coba tulis transaksi (misal 'makan 20rb') atau minta bikin kategori baru.",
+        "additionalFields": {}
+      },
+      "id": "b81b87b6-cf32-4573-8048-3d22cd92d4a4",
+      "name": "Balas: Tidak Dikenali",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3376,
+        2880
+      ],
+      "webhookId": "22c34da1-429d-4432-8516-a775e22d44fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "332d7032-7ca0-4b0a-9fd5-e398d882da89",
+          "mode": "list",
+          "cachedResultName": "Pending Kategori",
+          "cachedResultUrl": "https://app.notion.com/p/332d70327ca04b0a9fd5e398d882da89"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Nama Kategori|title",
+              "title": "={{ $json.nama_kategori }}"
+            },
+            {
+              "key": "Limit Bulanan|number",
+              "numberValue": "={{ $json.limit_bulanan }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "=Pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "50b28566-50b7-45b1-aefe-406deb9040b0",
+      "name": "Buat Pending Kategori",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3152,
+        2432
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $env.TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"chat_id\": \"{{ $('Telegram Trigger').first().json.message.chat.id }}\", \"text\": \"{{ 'Mau bikin kategori budget baru: ' + $('Parse Hasil Gemini (Teks)').first().json.nama_kategori + ', limit Rp' + $('Parse Hasil Gemini (Teks)').first().json.limit_bulanan.toLocaleString('id-ID') + ' per bulan?' }}\", \"reply_markup\": {\"inline_keyboard\": [[{\"text\": \"Ya, buat\", \"callback_data\": \"{{ 'katy|' + $json.id }}\"}, {\"text\": \"Gak usah\", \"callback_data\": \"{{ 'katn|' + $json.id }}\"}]]}}",
+        "options": {}
+      },
+      "id": "d35ddb99-14d0-4e0b-859a-d4a8518e6f48",
+      "name": "Tanya Konfirmasi Kategori Baru",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3376,
+        2432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nreturn [{\n  json: {\n    deskripsi: d.deskripsi,\n    tanggal: d.tanggal,\n    jumlah: d.jumlah,\n    tipe: d.tipe,\n    kategori: d.kategori,\n    rekening: d.rekening,\n    sumber: d.sumber || 'Chat',\n    chat_id: $('Telegram Trigger').first().json.message.chat.id\n  }\n}];"
+      },
+      "id": "0fd6f8ff-f84e-4da4-9ec9-d0b4b68d2ee7",
+      "name": "Normalize Langsung",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3600,
+        2720
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "acfb0376-c50d-4cb7-8656-d2de11c45c83",
+      "name": "Gabungkan Transaksi Tanpa Rekening",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        3600,
+        2480
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "2886db8c-bbbc-4bb2-ab1d-85f11998d45a",
+          "mode": "list",
+          "cachedResultName": "Pending Rekening",
+          "cachedResultUrl": "https://app.notion.com/p/2886db8cbbbc4bb2ab1d85f11998d45a"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Tanggal|date",
+              "date": "={{ $json.tanggal }}",
+              "timezone": "Asia/Makassar"
+            },
+            {
+              "key": "Jumlah|number",
+              "numberValue": "={{ $json.jumlah }}"
+            },
+            {
+              "key": "Tipe|select",
+              "selectValue": "={{ $json.tipe }}"
+            },
+            {
+              "key": "Kategori|select",
+              "selectValue": "={{ $json.kategori }}"
+            },
+            {
+              "key": "Sumber|select",
+              "selectValue": "={{ $json.sumber }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "Pending"
+            },
+            {
+              "key": "Nama|title",
+              "title": "={{ $json.deskripsi }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b913aa94-ae63-4335-96ac-52d075d4e7a9",
+      "name": "Buat Pending Rekening",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3824,
+        2480
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $env.TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"chat_id\": \"{{ $('Telegram Trigger').first().json.message.chat.id }}\", \"text\": \"{{ 'Transaksi: ' + $('Buat Pending Rekening').first().json.property_deskripsi + ' (Rp' + $('Buat Pending Rekening').first().json.property_jumlah.toLocaleString('id-ID') + '). Ini dari rekening mana?' }}\", \"reply_markup\": {\"inline_keyboard\": [[{\"text\": \"Mandiri\", \"callback_data\": \"{{ 'acc|Mandiri|' + $json.id }}\"}, {\"text\": \"BSI\", \"callback_data\": \"{{ 'acc|BSI|' + $json.id }}\"}, {\"text\": \"Jago\", \"callback_data\": \"{{ 'acc|Jago|' + $json.id }}\"}], [{\"text\": \"Dana\", \"callback_data\": \"{{ 'acc|Dana|' + $json.id }}\"}, {\"text\": \"Gopay\", \"callback_data\": \"{{ 'acc|Gopay|' + $json.id }}\"}, {\"text\": \"OVO\", \"callback_data\": \"{{ 'acc|OVO|' + $json.id }}\"}]]}}",
+        "options": {}
+      },
+      "id": "691d637d-d4d2-4826-9a76-f0633027628b",
+      "name": "Tanya Pilih Rekening",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4032,
+        2480
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2aa4a455-29d0-40a5-a9cd-1f706b4ad42b",
+      "name": "Gabungkan Data Transaksi",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        3824,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "26080c94-a41c-4d6e-9842-87d2cee32f60",
+          "mode": "list",
+          "cachedResultName": "Saldo",
+          "cachedResultUrl": "https://app.notion.com/p/26080c94a41c4d6e984287d2cee32f60"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Nama|title",
+              "condition": "equals",
+              "titleValue": "={{ $json.rekening }}",
+              "selectValue": "={{ $json.rekening }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "051dd513-3ef0-49a2-af9d-38a576523434",
+      "name": "Ambil Saldo Rekening",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4032,
+        2720
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const transaksi = $('Gabungkan Data Transaksi').first().json;\nconst saldoPage = $input.first().json;\nconst saldoLama = saldoPage.property_saldo_sekarang;\n\nlet saldoBaru;\nif (transaksi.tipe === 'Expense') {\n  saldoBaru = saldoLama - transaksi.jumlah;\n} else {\n  saldoBaru = saldoLama + transaksi.jumlah;\n}\n\nreturn [{\n  json: { ...transaksi, saldo_lama: saldoLama, saldo_baru: saldoBaru, saldo_page_id: saldoPage.id }\n}];"
+      },
+      "id": "35d0e897-d258-4368-beef-8fa854b2680a",
+      "name": "Hitung Saldo Baru",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4256,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.saldo_page_id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Saldo Awal|number",
+              "numberValue": "={{ $json.saldo_lama }}"
+            },
+            {
+              "key": "Saldo Sekarang|number",
+              "numberValue": "={{ $json.saldo_baru }}"
+            },
+            {
+              "key": "Terakhir Update|date",
+              "date": "={{ $json.tanggal }}",
+              "timezone": "Asia/Makassar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "23f7310b-8f94-4887-814f-1d5372a36ade",
+      "name": "Update Saldo",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4480,
+        2720
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "1466d580-3b36-4316-8439-4425dcdae677",
+          "mode": "list",
+          "cachedResultName": "Transaksi",
+          "cachedResultUrl": "https://app.notion.com/p/1466d5803b36431684394425dcdae677"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Deskripsi|title",
+              "title": "={{ $('Hitung Saldo Baru').item.json.deskripsi }}"
+            },
+            {
+              "key": "Tanggal|date",
+              "date": "={{ $('Hitung Saldo Baru').item.json.tanggal }}",
+              "timezone": "Asia/Makassar"
+            },
+            {
+              "key": "Jumlah|number",
+              "numberValue": "={{ $('Hitung Saldo Baru').item.json.jumlah }}"
+            },
+            {
+              "key": "Tipe|select",
+              "selectValue": "={{ $('Hitung Saldo Baru').item.json.tipe }}"
+            },
+            {
+              "key": "Kategori|select",
+              "selectValue": "={{ $('Hitung Saldo Baru').item.json.kategori }}"
+            },
+            {
+              "key": "Rekening|select",
+              "selectValue": "={{ $('Hitung Saldo Baru').item.json.rekening }}"
+            },
+            {
+              "key": "Sumber|select",
+              "selectValue": "={{ $('Hitung Saldo Baru').item.json.sumber }}"
+            },
+            {
+              "key": "Saldo Setelah Transaksi|number",
+              "numberValue": "={{ $('Hitung Saldo Baru').item.json.saldo_baru }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d8a79715-f8b3-470a-87ef-827c3a68d7af",
+      "name": "Catat Transaksi",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4704,
+        2720
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "7b043362-74e4-4474-8387-c0adb71050a3",
+          "mode": "list",
+          "cachedResultName": "Budget",
+          "cachedResultUrl": "https://app.notion.com/p/7b04336274e444748387c0adb71050a3"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Kategori|select",
+              "condition": "equals",
+              "selectValue": "={{ $json.property_kategori }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4406c2bf-dc0f-4b74-b352-66bb74a3ad12",
+      "name": "Ambil Budget Kategori",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4912,
+        2720
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const transaksi = $('Hitung Saldo Baru').first().json;\nconst budgetItems = $input.all();\n\nif (transaksi.tipe !== 'Expense' || budgetItems.length === 0) {\n  return [{ json: { ...transaksi, warning_level: 'none' } }];\n}\n\nconst budget = budgetItems[0].json;\nconst limit = budget.property_limit_bulanan || 0;\nconst terpakai = (budget.property_terpakai_bulan_ini || 0) + transaksi.jumlah;\nconst persen = limit > 0 ? (terpakai / limit) * 100 : 100;\n\nlet warningLevel = 'none';\nif (persen >= 90) warningLevel = '90';\nelse if (persen >= 80) warningLevel = '80';\n\nreturn [{\n  json: { ...transaksi, limit, terpakai, persen: Math.round(persen), warning_level: warningLevel, budget_page_id: budget.id }\n}];"
+      },
+      "id": "6d1d2f2c-1bba-4b07-88b5-b75ea1eb608d",
+      "name": "Cek Ambang Budget",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5136,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.budget_page_id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Terpakai Bulan Ini|number",
+              "numberValue": "={{ $json.terpakai }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8b92c6de-bc43-4561-b8ab-a5d9b7e6a8d0",
+      "name": "Update Terpakai Bulan Ini",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        5344,
+        2864
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.tipe === 'Income' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "475935b3-7aab-4105-b91b-0b070252aa4a",
+      "name": "Tipe: Income?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        5584,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.budget_page_id ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "81489472-5a0c-4132-befe-4ad9e522ef49",
+      "name": "Budget Kategori Ditemukan?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        5360,
+        2624
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Hitung Saldo Baru').first().json.chat_id }}",
+        "text": "={{ '✅ Tercatat: ' + $json.deskripsi + ' - Rp' + $json.jumlah.toLocaleString('id-ID') + ' (' + $json.kategori + ').' }}",
+        "additionalFields": {}
+      },
+      "id": "ffc754c5-4248-4200-bfa4-8c6db5a6fb74",
+      "name": "Balas Fallback (Expense Tanpa Budget)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5792,
+        2880
+      ],
+      "webhookId": "d5e98f51-1e40-481f-aa10-62e857f873ea",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "7b043362-74e4-4474-8387-c0adb71050a3",
+          "mode": "list",
+          "cachedResultName": "Budget",
+          "cachedResultUrl": "https://app.notion.com/p/7b04336274e444748387c0adb71050a3"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "99fcae02-f11c-449c-b0cc-1007bdfd539c",
+      "name": "Ambil Semua Budget (Ekspansi)",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        5792,
+        2720
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const income = $('Hitung Saldo Baru').first().json.jumlah;\nconst budgets = $input.all().map(i => i.json);\nconst totalLimitLama = budgets.reduce((sum, b) => sum + (b.property_limit_bulanan || 0), 0);\n\nif (totalLimitLama === 0) {\n  return [{ json: { skip: true } }];\n}\n\nreturn budgets.map(b => {\n  const proporsi = (b.property_limit_bulanan || 0) / totalLimitLama;\n  const tambahan = Math.round(income * proporsi);\n  return {\n    json: {\n      page_id: b.id,\n      kategori: b.property_kategori,\n      limit_lama: b.property_limit_bulanan || 0,\n      limit_baru: (b.property_limit_bulanan || 0) + tambahan,\n      tambahan\n    }\n  };\n});"
+      },
+      "id": "aca9c8ac-e2ef-4c98-a76c-0a36e0b7de9b",
+      "name": "Hitung Ekspansi Budget",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6016,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.page_id }}",
+          "__regex": "^([0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12})"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "=Limit Bulanan",
+              "numberValue": "={{ $json.limit_baru }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ab58a145-336b-445d-8499-7d787bb0c19c",
+      "name": "Update Limit Budget (Ekspansi)",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        6240,
+        2720
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nconst chatId = $('Hitung Saldo Baru').first().json.chat_id;\nconst jumlahIncome = $('Hitung Saldo Baru').first().json.jumlah;\n\nlet text = '💰 Income Rp' + jumlahIncome.toLocaleString('id-ID') + ' masuk! Budget bulanan ikut nambah proporsional:\\n\\n';\nitems.forEach(it => {\n  text += '- ' + it.kategori + ': Rp' + it.limit_lama.toLocaleString('id-ID') + ' -> Rp' + it.limit_baru.toLocaleString('id-ID') + ' (+Rp' + it.tambahan.toLocaleString('id-ID') + ')\\n';\n});\n\nreturn [{ json: { chat_id: chatId, text } }];"
+      },
+      "id": "24de5cf0-7669-46e5-92d9-20670848a73a",
+      "name": "Rangkum Ekspansi",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6464,
+        2720
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "id": "11f6e14b-ac1a-4738-a571-e4dc17ea461e",
+      "name": "Balas Ekspansi Budget",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        6672,
+        2720
+      ],
+      "webhookId": "749f6340-f50c-47c6-9afa-9b0a8ce14ccd",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "7b043362-74e4-4474-8387-c0adb71050a3",
+          "mode": "list",
+          "cachedResultName": "Budget",
+          "cachedResultUrl": "https://app.notion.com/p/7b04336274e444748387c0adb71050a3"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "6949bc0b-1f43-4d1d-82d6-424b0ff961bf",
+      "name": "Ambil Semua Budget (Realokasi)",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        5792,
+        2528
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const current = $('Cek Ambang Budget').first().json;\nconst allBudgets = $input.all().map(i => i.json);\n\nif (current.warning_level === 'none') {\n  return [{ json: { ...current, has_realokasi_option: false } }];\n}\n\nconst kandidat = allBudgets\n  .filter(b => b.property_kategori !== current.kategori)\n  .map(b => ({\n    kategori: b.property_kategori,\n    page_id: b.id,\n    sisa: (b.property_limit_bulanan || 0) - (b.property_terpakai_bulan_ini || 0)\n  }))\n  .filter(b => b.sisa > 0)\n  .sort((a, b) => b.sisa - a.sisa);\n\nif (kandidat.length === 0) {\n  return [{ json: { ...current, has_realokasi_option: false } }];\n}\n\nconst sumber = kandidat[0];\nconst topUp = Math.min(Math.round(current.limit * 0.2), sumber.sisa);\n\nreturn [{\n  json: {\n    ...current, has_realokasi_option: topUp > 0,\n    sumber_kategori: sumber.kategori, sumber_page_id: sumber.page_id,\n    sumber_sisa: sumber.sisa, jumlah_realokasi: topUp\n  }\n}];"
+      },
+      "id": "09a99e7f-c366-4c3d-92fa-67ffde8622f6",
+      "name": "Hitung Opsi Realokasi",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6016,
+        2528
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.has_realokasi_option }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              },
+              "id": "03f97668-8174-4791-8e62-291f4b556876"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ecef2790-b045-44b7-bdac-b069539c8d53",
+      "name": "Bisa Realokasi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        6240,
+        2528
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "6d023ff8-05e6-4517-bcf5-550de7644c3c",
+          "mode": "list",
+          "cachedResultName": "Pending Realokasi",
+          "cachedResultUrl": "https://app.notion.com/p/6d023ff805e64517bcf5550de7644c3c"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Jumlah|number",
+              "numberValue": "={{ $json.jumlah_realokasi }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "Pending"
+            },
+            {
+              "key": "Nama|title",
+              "title": "={{ 'Realokasi ' + $json.sumber_kategori + ' -> ' + $json.kategori }}"
+            },
+            {
+              "key": "Dari Page Id|url",
+              "urlValue": "={{ $json.sumber_page_id }}"
+            },
+            {
+              "key": "Ke Page Id|url",
+              "urlValue": "={{ $json.budget_page_id }}"
+            },
+            {
+              "key": "Dari Kategori|select",
+              "selectValue": "={{ $json.sumber_kategori }}"
+            },
+            {
+              "key": "Ke Kategori|select",
+              "selectValue": "={{ $json.kategori }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "765ec684-49d8-464e-ad2f-4780a5adf752",
+      "name": "Buat Pengajuan Realokasi",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        6464,
+        2432
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $env.TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"chat_id\": \"{{ $('Hitung Saldo Baru').first().json.chat_id }}\", \"text\": \"{{ '🟡 Budget ' + $('Hitung Opsi Realokasi').first().json.kategori + ' udah ' + $('Hitung Opsi Realokasi').first().json.persen + '% terpakai. Kategori ' + $('Hitung Opsi Realokasi').first().json.sumber_kategori + ' masih sisa Rp' + $('Hitung Opsi Realokasi').first().json.sumber_sisa.toLocaleString('id-ID') + '. Mau gua pindahin Rp' + $('Hitung Opsi Realokasi').first().json.jumlah_realokasi.toLocaleString('id-ID') + ' ke sana biar gak jebol?' }}\", \"reply_markup\": {\"inline_keyboard\": [[{\"text\": \"Ya, pindahin\", \"callback_data\": \"{{ 'rlk|' + $json.id }}\"}, {\"text\": \"Gak usah\", \"callback_data\": \"{{ 'no|' + $json.id }}\"}]]}}",
+        "options": {}
+      },
+      "id": "38881a22-8c6c-45b9-a795-9639edce33ab",
+      "name": "Tanya Konfirmasi Realokasi",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6672,
+        2432
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Hitung Saldo Baru').first().json.chat_id }}",
+        "text": "={{ $json.warning_level === '90' ? '🔴 AWAS! Budget ' + $json.kategori + ' udah kepake ' + $json.persen + '% (Rp' + $json.terpakai.toLocaleString('id-ID') + ' dari Rp' + $json.limit.toLocaleString('id-ID') + '), dan gak ada kategori lain yang punya sisa. Rem beneran sekarang.' : $json.warning_level === '80' ? '🟡 Budget ' + $json.kategori + ' udah ' + $json.persen + '% terpakai, tapi kategori lain juga lagi mepet semua.' : '✅ Tercatat: ' + $json.deskripsi + ' - Rp' + $json.jumlah.toLocaleString('id-ID') + ' (' + $json.kategori + ', ' + $json.rekening + '). Saldo ' + $json.rekening + ' sekarang: Rp' + $json.saldo_baru.toLocaleString('id-ID') }}",
+        "additionalFields": {}
+      },
+      "id": "609ea6bd-0383-4c08-8877-69d986231885",
+      "name": "Balas Normal (Tanpa Realokasi)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        6464,
+        2624
+      ],
+      "webhookId": "3a91b447-ca08-44fa-b693-d327fd554e92",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.jenis === 'cek_saldo' }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1266828b-8198-4b56-b8ac-faeb6df0ebe3",
+      "name": "Jenis: Cek Saldo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        176,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "26080c94-a41c-4d6e-9842-87d2cee32f60",
+          "mode": "list",
+          "cachedResultName": "Saldo",
+          "cachedResultUrl": "https://app.notion.com/p/26080c94a41c4d6e984287d2cee32f60"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "9607b7d9-0963-4e18-8c63-897ccf3d23b0",
+      "name": "Ambil Semua Saldo",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        -112
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nlet total = 0;\nlet text = '💰 Saldo lo saat ini:\\n\\n';\nitems.forEach(it => {\n  const nama = it.property_nama || it.name || '(tanpa nama)';\n  const saldo = it.property_saldo_sekarang || 0;\n  total += saldo;\n  text += '- ' + nama + ': Rp' + saldo.toLocaleString('id-ID') + '\\n';\n});\ntext += '\\nTotal semua rekening: Rp' + total.toLocaleString('id-ID');\n\nreturn [{ json: { chat_id: $('Telegram Trigger').first().json.message.chat.id, text } }];"
+      },
+      "id": "1719ce4c-37f2-4593-a208-14c519db2fe7",
+      "name": "Rangkum Saldo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "id": "3bd024ca-261e-425a-b559-9d23ac104bb4",
+      "name": "Balas Saldo",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        -112
+      ],
+      "webhookId": "bfe670f0-8a15-46aa-90c2-c39f3faa8ff2",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "5 0 1 * *"
+            }
+          ]
+        }
+      },
+      "id": "6664454a-ba90-4097-9e5a-83e5c29f77a1",
+      "name": "Jadwal Reset Bulanan",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -928,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "7b043362-74e4-4474-8387-c0adb71050a3",
+          "mode": "list",
+          "cachedResultName": "Budget",
+          "cachedResultUrl": "https://app.notion.com/p/7b04336274e444748387c0adb71050a3"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "3e29abf2-0e46-45a7-ad3b-f94cdf7f16e8",
+      "name": "Ambil Semua Budget (Reset)",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -704,
+        192
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Terpakai Bulan Ini|number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b7d94516-d9c3-4453-aea6-5eb3be594d1c",
+      "name": "Reset Terpakai Bulan Ini",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        192
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "DLwaLyW8jOxb0qaX",
+          "name": "Notion account 2"
+        }
+      },
+      "notes": "PENTING: field 'Database Page' (pageId) di node ini WAJIB diisi manual di UI n8n dengan {{ $json.id }} -- gak bisa gua set di JSON karena field pageId untuk operasi update itu terpisah dari databaseId, dan formatnya rawan beda tiap versi n8n (persis kayak masalah2 sebelumnya)."
+    },
+    {
+      "parameters": {
+        "jsCode": "const chatId = '1003375942'; // GANTI kalau chat_id lo beda -- cek di eksekusi Telegram Trigger sebelumnya\nreturn [{ json: { chat_id: chatId, text: '🔄 Budget bulan baru! Semua \"Terpakai Bulan Ini\" udah direset ke 0. Gas semangat baru.' } }];"
+      },
+      "id": "0c0c8366-8db0-4c79-9534-c7625b828dfc",
+      "name": "Siapkan Notifikasi Reset",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "id": "48d524e6-bab2-49ec-a0ab-0229b826d29e",
+      "name": "Balas Notif Reset Bulanan",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        192
+      ],
+      "webhookId": "dedbb636-220f-4e6c-ba0c-aa98be908430",
+      "credentials": {
+        "telegramApi": {
+          "id": "koc5NBsGRGQSYPEC",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.message?.chat?.id ?? $json.callback_query?.message?.chat?.id }}",
+              "rightValue": 1003375942,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f47b1e6a-9c3d-4e1a-8b2f-6a1d9c4e7b3a",
+      "name": "Filter: Hanya Chat Pribadi",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1952, 2080],
+      "notes": "Safeguard: skip semua update Telegram yang bukan dari chat pribadi owner (chat.id 1003375942), supaya grup demo publik di website portofolio tidak pernah memicu workflow keuangan asli ini. Output 'false' sengaja tidak disambungkan ke node manapun -- itu menghentikan eksekusi untuk update yang bukan dari owner."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter: Hanya Chat Pribadi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter: Hanya Chat Pribadi": {
+      "main": [
+        [
+          {
+            "node": "Ada Callback Konfirmasi?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Ada Callback Konfirmasi?": {
+      "main": [
+        [
+          {
+            "node": "Parse Callback Router",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ada Foto?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Callback Router": {
+      "main": [
+        [
+          {
+            "node": "Tipe: Realokasi?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipe: Realokasi?": {
+      "main": [
+        [
+          {
+            "node": "Ambil Data Pending Realokasi",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tipe: Rekening?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipe: Rekening?": {
+      "main": [
+        [
+          {
+            "node": "Ambil Data Pending Rekening (Callback)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ambil Data Pending Kategori (Callback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ada Foto?": {
+      "main": [
+        [
+          {
+            "node": "Download Struk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gemini - Baca Teks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Data Pending Realokasi": {
+      "main": [
+        [
+          {
+            "node": "User Setuju Realokasi?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Setuju Realokasi?": {
+      "main": [
+        [
+          {
+            "node": "Ambil Budget Sumber",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tandai Pending Realokasi Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Budget Sumber": {
+      "main": [
+        [
+          {
+            "node": "Ambil Budget Tujuan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Budget Tujuan": {
+      "main": [
+        [
+          {
+            "node": "Hitung Limit Baru",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hitung Limit Baru": {
+      "main": [
+        [
+          {
+            "node": "Update Limit Sumber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Limit Sumber": {
+      "main": [
+        [
+          {
+            "node": "Update Limit Tujuan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Limit Tujuan": {
+      "main": [
+        [
+          {
+            "node": "Tandai Pending Realokasi Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tandai Pending Realokasi Approved": {
+      "main": [
+        [
+          {
+            "node": "Balas: Realokasi Sukses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tandai Pending Realokasi Rejected": {
+      "main": [
+        [
+          {
+            "node": "Balas: Realokasi Ditolak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Data Pending Rekening (Callback)": {
+      "main": [
+        [
+          {
+            "node": "Tandai Pending Rekening Selesai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tandai Pending Rekening Selesai": {
+      "main": [
+        [
+          {
+            "node": "Normalize Dari Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Dari Pending": {
+      "main": [
+        [
+          {
+            "node": "Gabungkan Data Transaksi",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Ambil Data Pending Kategori (Callback)": {
+      "main": [
+        [
+          {
+            "node": "Approve Kategori?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approve Kategori?": {
+      "main": [
+        [
+          {
+            "node": "Buat Kategori Baru di Budget",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tandai Pending Kategori Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buat Kategori Baru di Budget": {
+      "main": [
+        [
+          {
+            "node": "Tandai Pending Kategori Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tandai Pending Kategori Approved": {
+      "main": [
+        [
+          {
+            "node": "Balas: Kategori Dibuat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tandai Pending Kategori Rejected": {
+      "main": [
+        [
+          {
+            "node": "Balas: Kategori Dibatalkan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Struk": {
+      "main": [
+        [
+          {
+            "node": "Gemini - Baca Struk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini - Baca Struk": {
+      "main": [
+        [
+          {
+            "node": "Parse Hasil Gemini (Struk)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Hasil Gemini (Struk)": {
+      "main": [
+        [
+          {
+            "node": "Gabungkan Transaksi Tanpa Rekening",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini - Baca Teks": {
+      "main": [
+        [
+          {
+            "node": "Parse Hasil Gemini (Teks)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Hasil Gemini (Teks)": {
+      "main": [
+        [
+          {
+            "node": "Jenis: Kategori Baru?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jenis: Kategori Baru?": {
+      "main": [
+        [
+          {
+            "node": "Buat Pending Kategori",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jenis: Cek Saldo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jenis: Transaksi?": {
+      "main": [
+        [
+          {
+            "node": "Rekening Disebut?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Balas: Tidak Dikenali",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rekening Disebut?": {
+      "main": [
+        [
+          {
+            "node": "Normalize Langsung",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gabungkan Transaksi Tanpa Rekening",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Buat Pending Kategori": {
+      "main": [
+        [
+          {
+            "node": "Tanya Konfirmasi Kategori Baru",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Langsung": {
+      "main": [
+        [
+          {
+            "node": "Gabungkan Data Transaksi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gabungkan Transaksi Tanpa Rekening": {
+      "main": [
+        [
+          {
+            "node": "Buat Pending Rekening",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buat Pending Rekening": {
+      "main": [
+        [
+          {
+            "node": "Tanya Pilih Rekening",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gabungkan Data Transaksi": {
+      "main": [
+        [
+          {
+            "node": "Ambil Saldo Rekening",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Saldo Rekening": {
+      "main": [
+        [
+          {
+            "node": "Hitung Saldo Baru",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hitung Saldo Baru": {
+      "main": [
+        [
+          {
+            "node": "Update Saldo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Saldo": {
+      "main": [
+        [
+          {
+            "node": "Catat Transaksi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catat Transaksi": {
+      "main": [
+        [
+          {
+            "node": "Ambil Budget Kategori",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Budget Kategori": {
+      "main": [
+        [
+          {
+            "node": "Cek Ambang Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Ambang Budget": {
+      "main": [
+        [
+          {
+            "node": "Budget Kategori Ditemukan?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Terpakai Bulan Ini": {
+      "main": [
+        [
+          {
+            "node": "Ambil Semua Budget (Realokasi)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipe: Income?": {
+      "main": [
+        [
+          {
+            "node": "Ambil Semua Budget (Ekspansi)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Balas Fallback (Expense Tanpa Budget)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Budget Kategori Ditemukan?": {
+      "main": [
+        [
+          {
+            "node": "Update Terpakai Bulan Ini",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tipe: Income?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Semua Budget (Ekspansi)": {
+      "main": [
+        [
+          {
+            "node": "Hitung Ekspansi Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hitung Ekspansi Budget": {
+      "main": [
+        [
+          {
+            "node": "Update Limit Budget (Ekspansi)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Limit Budget (Ekspansi)": {
+      "main": [
+        [
+          {
+            "node": "Rangkum Ekspansi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rangkum Ekspansi": {
+      "main": [
+        [
+          {
+            "node": "Balas Ekspansi Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Semua Budget (Realokasi)": {
+      "main": [
+        [
+          {
+            "node": "Hitung Opsi Realokasi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hitung Opsi Realokasi": {
+      "main": [
+        [
+          {
+            "node": "Bisa Realokasi?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bisa Realokasi?": {
+      "main": [
+        [
+          {
+            "node": "Buat Pengajuan Realokasi",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Balas Normal (Tanpa Realokasi)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buat Pengajuan Realokasi": {
+      "main": [
+        [
+          {
+            "node": "Tanya Konfirmasi Realokasi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jenis: Cek Saldo?": {
+      "main": [
+        [
+          {
+            "node": "Ambil Semua Saldo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jenis: Transaksi?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Semua Saldo": {
+      "main": [
+        [
+          {
+            "node": "Rangkum Saldo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rangkum Saldo": {
+      "main": [
+        [
+          {
+            "node": "Balas Saldo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jadwal Reset Bulanan": {
+      "main": [
+        [
+          {
+            "node": "Ambil Semua Budget (Reset)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Semua Budget (Reset)": {
+      "main": [
+        [
+          {
+            "node": "Reset Terpakai Bulan Ini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reset Terpakai Bulan Ini": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Notifikasi Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Notifikasi Reset": {
+      "main": [
+        [
+          {
+            "node": "Balas Notif Reset Bulanan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ae7ba832-fb2a-4060-adaa-5787ce8d2b03",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "40c7884f31bab3275c09189bb77bb4b54827174ae9f02aefeadcdf05a0309932"
+  },
+  "nodeGroups": [],
+  "id": "l7cDrEiRDyeB68kc",
+  "tags": []
+}
