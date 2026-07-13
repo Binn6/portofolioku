@@ -35,6 +35,35 @@ class FinanceWalletService
         return $this->parseGeminiJson($response->json());
     }
 
+    public function classifyReceipt(string $base64Data, string $mimeType): array
+    {
+        $prompt = 'Ekstrak data transaksi dari struk ini. Balas HANYA dengan JSON valid, tanpa teks lain, format persis: '
+            . '{"tanggal":"YYYY-MM-DD","jumlah":angka,"tipe":"Expense","kategori":"salah satu dari: Makanan, Transport, Belanja, Tagihan, Hiburan, Lainnya","deskripsi":"ringkasan singkat"}';
+
+        $response = Http::withHeaders([
+            'x-goog-api-key' => (string) config('finance_wallet.gemini_api_key'),
+            'content-type' => 'application/json',
+        ])->post(self::MODEL_URL, [
+            'contents' => [[
+                'role' => 'user',
+                'parts' => [
+                    ['inline_data' => ['mime_type' => $mimeType, 'data' => $base64Data]],
+                    ['text' => $prompt],
+                ],
+            ]],
+            'generationConfig' => [
+                'maxOutputTokens' => 2048,
+                'temperature' => 0,
+                'thinkingConfig' => ['thinkingBudget' => 0],
+            ],
+        ]);
+
+        $data = $this->parseGeminiJson($response->json());
+        $data['sumber'] = 'Foto Struk';
+
+        return $data;
+    }
+
     private function parseGeminiJson(?array $response): array
     {
         $candidate = $response['candidates'][0] ?? null;
