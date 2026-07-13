@@ -183,6 +183,98 @@ class FinanceWalletService
         return $summary;
     }
 
+    public function createPendingAccountChoice(array $draftTransaksi, string $visitorTag): FinancePendingAction
+    {
+        return FinancePendingAction::create([
+            'tipe' => 'rekening',
+            'payload' => $draftTransaksi,
+            'status' => 'pending',
+            'visitor_tag' => $visitorTag,
+        ]);
+    }
+
+    public function createPendingCategory(string $namaKategori, float $limitBulanan, string $visitorTag): FinancePendingAction
+    {
+        return FinancePendingAction::create([
+            'tipe' => 'kategori',
+            'payload' => ['nama_kategori' => $namaKategori, 'limit_bulanan' => $limitBulanan],
+            'status' => 'pending',
+            'visitor_tag' => $visitorTag,
+        ]);
+    }
+
+    public function resolvePending(string $pendingId, string $action, ?string $choice = null): array
+    {
+        $pending = FinancePendingAction::findOrFail($pendingId);
+
+        if ($pending->status !== 'pending') {
+            throw new \RuntimeException('Aksi ini sudah diproses sebelumnya.');
+        }
+
+        return match ($pending->tipe) {
+            'rekening' => $this->resolveRekening($pending, $action, $choice),
+            'kategori' => $this->resolveKategori($pending, $action),
+            'realokasi' => $this->resolveRealokasi($pending, $action),
+            default => throw new \RuntimeException('Tipe pending tidak dikenal.'),
+        };
+    }
+
+    private function resolveRekening(FinancePendingAction $pending, string $action, ?string $choice): array
+    {
+        if ($action !== 'accept' || !$choice) {
+            $pending->update(['status' => 'rejected']);
+            return ['reply' => 'Oke, transaksi dibatalkan.', 'transaction' => null];
+        }
+
+        $draft = $pending->payload;
+        $draft['rekening'] = $choice;
+        $pending->update(['status' => 'approved']);
+
+        return $this->recordTransaction($draft, $pending->visitor_tag);
+    }
+
+    private function resolveKategori(FinancePendingAction $pending, string $action): array
+    {
+        if ($action !== 'accept') {
+            $pending->update(['status' => 'rejected']);
+            return ['reply' => 'Oke, gak jadi bikin kategori baru.', 'transaction' => null];
+        }
+
+        $payload = $pending->payload;
+        FinanceBudget::create([
+            'kategori' => $payload['nama_kategori'],
+            'limit_bulanan' => $payload['limit_bulanan'],
+            'terpakai_bulan_ini' => 0,
+        ]);
+        $pending->update(['status' => 'approved']);
+
+        return [
+            'reply' => "✅ Kategori '{$payload['nama_kategori']}' udah dibuat dengan limit Rp" . number_format($payload['limit_bulanan'], 0, ',', '.') . '.',
+            'transaction' => null,
+        ];
+    }
+
+    private function resolveRealokasi(FinancePendingAction $pending, string $action): array
+    {
+        if ($action !== 'accept') {
+            $pending->update(['status' => 'rejected']);
+            return ['reply' => 'Oke, gak jadi realokasi. Budget tetap seperti semula.', 'transaction' => null];
+        }
+
+        $payload = $pending->payload;
+        $dari = FinanceBudget::where('kategori', $payload['dari_kategori'])->firstOrFail();
+        $ke = FinanceBudget::where('kategori', $payload['ke_kategori'])->firstOrFail();
+
+        $dari->update(['limit_bulanan' => $dari->limit_bulanan - $payload['jumlah']]);
+        $ke->update(['limit_bulanan' => $ke->limit_bulanan + $payload['jumlah']]);
+        $pending->update(['status' => 'approved']);
+
+        return [
+            'reply' => '✅ Realokasi jalan. Rp' . number_format($payload['jumlah'], 0, ',', '.') . " pindah dari budget {$payload['dari_kategori']} ke {$payload['ke_kategori']}.",
+            'transaction' => null,
+        ];
+    }
+
     private function parseGeminiJson(?array $response): array
     {
         $candidate = $response['candidates'][0] ?? null;
