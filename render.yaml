@@ -7,3 +7,13 @@ services:
     dockerContext: ./backend
     plan: free
     healthCheckPath: /up
+
+  - type: cron
+    name: finance-wallet-demo-reset
+    env: docker
+    branch: main
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    schedule: "0 17 * * *"
+    dockerCommand: php artisan finance-wallet:reset
+    plan: free
