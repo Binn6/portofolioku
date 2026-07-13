@@ -84,6 +84,19 @@ export const adminDeleteConversation = (sessionId) => api.delete(`/admin/chat/${
 export const chatSend = (data) => api.post('/chat', data)
 export const chatPoll = (sessionId) => api.get(`/chat/${sessionId}`)
 
+// Public — Finance Wallet demo
+export const financeWalletSendMessage = (data) =>
+  api.post('/finance-wallet/message', data).then(r => r.data)
+
+export const financeWalletSendPhoto = (formData) =>
+  api.post('/finance-wallet/photo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
+
+export const financeWalletConfirm = (data) =>
+  api.post('/finance-wallet/confirm', data).then(r => r.data)
+
+export const financeWalletGetState = () =>
+  api.get('/finance-wallet/state').then(r => r.data)
+
 // ─── SQL GAME — Admin Chapters ───────────────────────────────
 export const adminGetSqlChapters = () =>
   api.get('/admin/sql-game/chapters').then(r => r.data)
