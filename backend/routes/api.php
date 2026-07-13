@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\EducationController;
 use App\Http\Controllers\Api\ExperienceController;
+use App\Http\Controllers\Api\FinanceWalletController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\SkillController;
@@ -32,6 +33,13 @@ Route::get('/certificates', [CertificateController::class, 'index']);
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:10,1');
 Route::post('/chat', [ChatController::class, 'send'])->middleware('throttle:30,1');
 Route::get('/chat/{sessionId}', [ChatController::class, 'messages'])->middleware('throttle:60,1');
+
+Route::prefix('finance-wallet')->group(function () {
+    Route::post('/message', [FinanceWalletController::class, 'message'])->middleware('throttle:15,1');
+    Route::post('/photo', [FinanceWalletController::class, 'photo'])->middleware('throttle:15,1');
+    Route::post('/confirm', [FinanceWalletController::class, 'confirm'])->middleware('throttle:15,1');
+    Route::get('/state', [FinanceWalletController::class, 'state'])->middleware('throttle:60,1');
+});
 
 // ── SQL GAME — Public ───────────────────────────────────────
 Route::get('/sql-game/config', [\App\Http\Controllers\Api\SqlGameController::class, 'config']);
