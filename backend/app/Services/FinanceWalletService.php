@@ -7,6 +7,7 @@ use App\Models\FinanceBudget;
 use App\Models\FinancePendingAction;
 use App\Models\FinanceTransaction;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class FinanceWalletService
@@ -273,6 +274,39 @@ class FinanceWalletService
             'reply' => '✅ Realokasi jalan. Rp' . number_format($payload['jumlah'], 0, ',', '.') . " pindah dari budget {$payload['dari_kategori']} ke {$payload['ke_kategori']}.",
             'transaction' => null,
         ];
+    }
+
+    public function relayToTelegram(string $text): void
+    {
+        $token = config('finance_wallet.telegram_bot_token');
+        $chatId = config('finance_wallet.telegram_group_chat_id');
+
+        if (!$token || !$chatId) {
+            return;
+        }
+
+        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+            'chat_id' => $chatId,
+            'text' => $text,
+        ]);
+    }
+
+    public function canCallGemini(): bool
+    {
+        $used = Cache::get($this->quotaCacheKey(), 0);
+        return $used < config('finance_wallet.gemini_daily_quota');
+    }
+
+    public function incrementGeminiUsage(): void
+    {
+        $key = $this->quotaCacheKey();
+        $used = Cache::get($key, 0);
+        Cache::put($key, $used + 1, now()->endOfDay());
+    }
+
+    private function quotaCacheKey(): string
+    {
+        return 'finance_wallet_gemini_quota_' . now('Asia/Makassar')->format('Y-m-d');
     }
 
     private function parseGeminiJson(?array $response): array
