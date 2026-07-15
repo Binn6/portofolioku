@@ -12,7 +12,7 @@ function ImageGroup({ src, alt, count = 1 }) {
 }
 
 export default function LatihanCpnsTiu() {
-  const [currentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
 
   const question = tiuQuestions[currentIndex]
@@ -30,6 +30,10 @@ export default function LatihanCpnsTiu() {
       ...prev,
       [question.id]: { ...prev[question.id], checked: true },
     }))
+  }
+
+  const goTo = (index) => {
+    if (index >= 0 && index < tiuQuestions.length) setCurrentIndex(index)
   }
 
   return (
@@ -98,14 +102,34 @@ export default function LatihanCpnsTiu() {
             })}
           </div>
 
-          <button
-            type="button"
-            disabled={answer.selectedIndex === null}
-            onClick={checkAnswer}
-            className="mt-5 px-4 py-2 rounded-lg border border-sql-primary/40 text-sql-primary disabled:opacity-30 disabled:cursor-not-allowed hover:bg-sql-primary/10"
-          >
-            Cek Jawaban
-          </button>
+          <div className="flex items-center justify-between mt-5">
+            <button
+              type="button"
+              disabled={currentIndex === 0}
+              onClick={() => goTo(currentIndex - 1)}
+              className="px-3 py-2 rounded-lg border border-border text-accent-muted disabled:opacity-30 disabled:cursor-not-allowed hover:border-accent-dim"
+            >
+              ◀ Soal Sebelumnya
+            </button>
+
+            <button
+              type="button"
+              disabled={answer.selectedIndex === null}
+              onClick={checkAnswer}
+              className="px-4 py-2 rounded-lg border border-sql-primary/40 text-sql-primary disabled:opacity-30 disabled:cursor-not-allowed hover:bg-sql-primary/10"
+            >
+              Cek Jawaban
+            </button>
+
+            <button
+              type="button"
+              disabled={currentIndex === tiuQuestions.length - 1}
+              onClick={() => goTo(currentIndex + 1)}
+              className="px-3 py-2 rounded-lg border border-border text-accent-muted disabled:opacity-30 disabled:cursor-not-allowed hover:border-accent-dim"
+            >
+              Soal Berikutnya ▶
+            </button>
+          </div>
 
           {answer.checked && (
             <div className="mt-4 border border-sql-primary/40 rounded-lg p-4 text-sm text-accent-muted">

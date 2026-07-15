@@ -44,4 +44,32 @@ describe('LatihanCpnsTiu', () => {
     expect(wrongOptionButton.className).toMatch(/red/)
     expect(correctOptionButton.className).toMatch(/sql-primary/)
   })
+
+  it('navigates with Prev/Next, disables at bounds, and preserves selection per question', () => {
+    render(<LatihanCpnsTiu />)
+
+    const prevButton = screen.getByRole('button', { name: /Soal Sebelumnya/ })
+    const nextButton = screen.getByRole('button', { name: /Soal Berikutnya/ })
+    expect(prevButton).toBeDisabled()
+
+    fireEvent.click(screen.getByText('Pasien'))
+    fireEvent.click(nextButton)
+    expect(screen.getByText('Soal 2/10')).toBeInTheDocument()
+
+    fireEvent.click(prevButton)
+    expect(screen.getByText('Soal 1/10')).toBeInTheDocument()
+    expect(screen.getByText('Pasien').closest('button').className).toMatch(/sql-secondary/)
+  })
+
+  it('disables Soal Berikutnya on the last question', () => {
+    render(<LatihanCpnsTiu />)
+
+    const nextButton = screen.getByRole('button', { name: /Soal Berikutnya/ })
+    for (let i = 0; i < 9; i++) {
+      fireEvent.click(nextButton)
+    }
+
+    expect(screen.getByText('Soal 10/10')).toBeInTheDocument()
+    expect(nextButton).toBeDisabled()
+  })
 })
