@@ -13,8 +13,24 @@ function ImageGroup({ src, alt, count = 1 }) {
 
 export default function LatihanCpnsTiu() {
   const [currentIndex] = useState(0)
+  const [answers, setAnswers] = useState({})
+
   const question = tiuQuestions[currentIndex]
-  const selectedIndex = null
+  const answer = answers[question.id] || { selectedIndex: null, checked: false }
+
+  const selectOption = (optionIndex) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [question.id]: { selectedIndex: optionIndex, checked: false },
+    }))
+  }
+
+  const checkAnswer = () => {
+    setAnswers((prev) => ({
+      ...prev,
+      [question.id]: { ...prev[question.id], checked: true },
+    }))
+  }
 
   return (
     <div className="min-h-screen bg-background text-accent font-mono px-4 py-10">
@@ -53,29 +69,50 @@ export default function LatihanCpnsTiu() {
           <p className="text-accent mb-5">{question.stem}</p>
 
           <div className="flex flex-col gap-2">
-            {question.options.map((option, i) => (
-              <button
-                key={option.label}
-                type="button"
-                className="w-full text-left border border-border rounded-lg p-3 flex items-center gap-3 hover:border-sql-secondary/60"
-              >
-                <span className="text-sql-dim">{option.label}.</span>
-                {option.image ? (
-                  <ImageGroup src={option.image.src} alt={option.image.alt} count={option.image.count} />
-                ) : (
-                  <span>{option.text}</span>
-                )}
-              </button>
-            ))}
+            {question.options.map((option, i) => {
+              const isSelected = answer.selectedIndex === i
+              const isCorrect = i === question.correctIndex
+              let stateClass = 'border-border hover:border-sql-secondary/60'
+              if (answer.checked) {
+                if (isCorrect) stateClass = 'border-sql-primary bg-sql-primary/10'
+                else if (isSelected) stateClass = 'border-red-500 bg-red-500/10'
+              } else if (isSelected) {
+                stateClass = 'border-sql-secondary'
+              }
+
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => selectOption(i)}
+                  className={`w-full text-left border rounded-lg p-3 flex items-center gap-3 ${stateClass}`}
+                >
+                  <span className="text-sql-dim">{option.label}.</span>
+                  {option.image ? (
+                    <ImageGroup src={option.image.src} alt={option.image.alt} count={option.image.count} />
+                  ) : (
+                    <span>{option.text}</span>
+                  )}
+                </button>
+              )
+            })}
           </div>
 
           <button
             type="button"
-            disabled={selectedIndex === null}
+            disabled={answer.selectedIndex === null}
+            onClick={checkAnswer}
             className="mt-5 px-4 py-2 rounded-lg border border-sql-primary/40 text-sql-primary disabled:opacity-30 disabled:cursor-not-allowed hover:bg-sql-primary/10"
           >
             Cek Jawaban
           </button>
+
+          {answer.checked && (
+            <div className="mt-4 border border-sql-primary/40 rounded-lg p-4 text-sm text-accent-muted">
+              <p className="text-sql-primary font-mono text-xs uppercase mb-1">Pembahasan</p>
+              <p>{question.explanation}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
