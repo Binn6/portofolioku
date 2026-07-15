@@ -54,6 +54,30 @@ export default function LatihanCpnsTiu() {
           </div>
         </header>
 
+        <div className="flex flex-wrap gap-2 mb-6">
+          {tiuQuestions.map((q, i) => {
+            const qa = answers[q.id]
+            let pillClass = 'border-border text-accent-muted'
+            if (i === currentIndex) pillClass = 'border-sql-primary text-sql-primary'
+            else if (qa?.checked) {
+              pillClass = qa.selectedIndex === q.correctIndex
+                ? 'border-sql-primary/50 text-sql-primary/70'
+                : 'border-red-500/50 text-red-400/70'
+            } else if (qa) pillClass = 'border-sql-secondary/50 text-sql-secondary/70'
+
+            return (
+              <button
+                key={q.id}
+                type="button"
+                onClick={() => goTo(i)}
+                className={`w-8 h-8 text-xs rounded-full border ${pillClass}`}
+              >
+                {i + 1}
+              </button>
+            )
+          })}
+        </div>
+
         <div className="border border-border rounded-xl bg-surface p-5">
           <span className="inline-block text-xs px-2 py-1 rounded-full border border-sql-secondary/40 text-sql-secondary mb-4">
             {question.category}

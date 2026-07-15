@@ -72,4 +72,13 @@ describe('LatihanCpnsTiu', () => {
     expect(screen.getByText('Soal 10/10')).toBeInTheDocument()
     expect(nextButton).toBeDisabled()
   })
+
+  it('jumps directly to a question via the number-pill navigator', () => {
+    render(<LatihanCpnsTiu />)
+
+    fireEvent.click(screen.getByRole('button', { name: '5' }))
+
+    expect(screen.getByText('Soal 5/10')).toBeInTheDocument()
+    expect(screen.getByText('Deret Huruf')).toBeInTheDocument()
+  })
 })
