@@ -81,4 +81,21 @@ describe('LatihanCpnsTiu', () => {
     expect(screen.getByText('Soal 5/10')).toBeInTheDocument()
     expect(screen.getByText('Deret Huruf')).toBeInTheDocument()
   })
+
+  it('renders image-based stem groups and options for the figural questions, and answer-checking still works', () => {
+    render(<LatihanCpnsTiu />)
+
+    fireEvent.click(screen.getByRole('button', { name: '9' }))
+    expect(screen.getByText('Figural (Deret Gambar)')).toBeInTheDocument()
+    expect(screen.getAllByAltText(/lingkaran/i).length).toBeGreaterThan(0)
+
+    const fiveCircleOption = screen.getByAltText('5 lingkaran merah').closest('button')
+    fireEvent.click(fiveCircleOption)
+    fireEvent.click(screen.getByRole('button', { name: 'Cek Jawaban' }))
+    expect(screen.getByText(/Pola menambahkan satu lingkaran/)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: '10' }))
+    expect(screen.getByText('Figural (Ketidaksamaan Gambar)')).toBeInTheDocument()
+    expect(screen.getAllByAltText(/segitiga/i)).toHaveLength(5)
+  })
 })
