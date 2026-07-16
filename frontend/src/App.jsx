@@ -18,6 +18,7 @@ import More from './pages/admin/More'
 import SqlGame from './pages/admin/SqlGame'
 import SqlMissionControl from './pages/SqlMissionControl'
 import FinanceWallet from './pages/FinanceWallet'
+import LatihanCpnsTiu from './pages/LatihanCpnsTiu'
 import ResetPassword from './pages/ResetPassword'
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/sql-mission-control" element={<SqlMissionControl />} />
           <Route path="/finance-wallet" element={<FinanceWallet />} />
+          <Route path="/latihan-cpns-tiu" element={<LatihanCpnsTiu />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/:section" element={<Portfolio />} />
           <Route path="/binn/login" element={<Login />} />
